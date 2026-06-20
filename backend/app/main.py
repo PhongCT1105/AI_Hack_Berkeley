@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.crawl import router as crawl_router
 from app.core.config import settings
 
 app = FastAPI(title=settings.app_name, debug=settings.debug)
@@ -13,6 +14,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(crawl_router)
 
 
 @app.get("/")
