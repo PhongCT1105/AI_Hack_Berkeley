@@ -1,13 +1,14 @@
 import { cn } from "@/lib/utils";
 
-type Tone = "neutral" | "success" | "warning" | "danger" | "info";
+type Tone = "neutral" | "success" | "warning" | "danger" | "info" | "purple";
 
 const tones: Record<Tone, string> = {
-  neutral: "border-border bg-muted text-muted-foreground",
-  success: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-  warning: "border-amber-500/30 bg-amber-500/10 text-amber-400",
-  danger: "border-rose-500/30 bg-rose-500/10 text-rose-400",
-  info: "border-sky-500/30 bg-sky-500/10 text-sky-400",
+  neutral: "border-gray-200  bg-gray-100   text-gray-600",
+  success: "border-emerald-200 bg-emerald-50  text-emerald-700",
+  warning: "border-amber-200  bg-amber-50   text-amber-700",
+  danger:  "border-red-200    bg-red-50     text-red-700",
+  info:    "border-sky-200    bg-sky-50     text-sky-700",
+  purple:  "border-violet-200 bg-violet-50  text-violet-700",
 };
 
 export function Badge({
@@ -18,7 +19,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+        "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap",
         tones[tone],
         className,
       )}

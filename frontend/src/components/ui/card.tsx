@@ -18,13 +18,16 @@ export function CardHeader({ className, ...props }: React.ComponentProps<"div">)
 
 export function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("text-sm font-semibold tracking-tight", className)} {...props} />
+    <div
+      className={cn("text-sm font-semibold tracking-tight text-gray-900", className)}
+      {...props}
+    />
   );
 }
 
 export function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={cn("text-xs text-muted-foreground", className)} {...props} />
+    <div className={cn("text-xs text-gray-500", className)} {...props} />
   );
 }
 
