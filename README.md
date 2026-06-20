@@ -1,8 +1,53 @@
-# AIHackBerk
+# AgentShield
+
+**Credibility infrastructure for AI agents — finance domain.** A calling agent sends a single
+`{url, task}` and AgentShield returns a **trust score (0–100)**, a **USE / CAUTION / AVOID**
+recommendation, **risk tags**, per-dimension **verdicts**, extracted **claims + evidence**, and a
+compressed **Credibility Capsule** (reduces 800–1500 tokens of source context to a compact packet).
+Exposed as a FastAPI endpoint *and* a FastMCP tool, so any MCP-capable agent can call it.
+
+> **Design principle:** graceful degradation. The app boots and returns a valid heuristic verdict
+> with **zero API keys**. Each integration (Anthropic, Browserbase, Redis, Sentry, Phoenix, Terac)
+> sits behind a `has_*` flag and falls back to an in-process path — the demo never hard-crashes.
+
+## What's built
+
+- **Engine** (`backend/app/`): pipeline `collector → extractor → features → ranker → capsule`.
+  - Collector: Browserbase/Stagehand → automatic **httpx fallback**.
+  - Extractor + Capsule: **Claude** (Anthropic SDK) → heuristic/extractive fallback.
+  - Ranker: transparent **heuristic** baseline (per-feature contributions + verdicts).
+- **MCP server** (`backend/mcp_server.py`): FastMCP stdio tool `agentshield_score_source`.
+- **Frontend** (`frontend/src/app/`): dark observability-console UI —
+  **Dashboard** (`/`), **Source Detail** (`/source/[id]`), **Terac Arena** (`/arena`).
+- **Terac Arena is UI-only this build.** Pairs/labels persist to a local JSON store; the real
+  Terac API/MCP + model training is a teammate's follow-up — see the `# TODO(terac):` notes in
+  `backend/app/ml/trainer.py` and `terac_store.py`. The heuristic stays the active scorer.
+
+## Quick start
+
+```bash
+# Backend (http://localhost:8000, docs at /docs) — works with no .env
+cd backend && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+
+# Frontend (http://localhost:3000)
+cd frontend && cp .env.local.example .env.local && npm run dev
+
+# MCP tool (optional) — engine must be running
+cd backend && python mcp_server.py          # or: claude mcp add agentshield -- python $(pwd)/mcp_server.py
+```
+
+`curl localhost:8000/api/health` reports which integrations are live. Copy `backend/.env.example`
+→ `backend/.env` to add keys (all optional). Phoenix skills:
+`npx skills add Arize-ai/phoenix --skill phoenix-tracing --skill phoenix-evals --skill phoenix-cli`.
+
+---
+
+## Scaffold reference
 
 Fullstack hackathon starter — **Next.js** frontend + **Python (FastAPI)** backend, pre-wired
-with a curated set of **Claude Code skills** and **MCP servers**. No app logic yet; this is the
-scaffold to build on once you pick an idea.
+with a curated set of **Claude Code skills** and **MCP servers**.
 
 ## Layout
 

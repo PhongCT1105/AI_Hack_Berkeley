@@ -6,7 +6,12 @@
       "Bash(git init *)",
       "Bash(git branch *)",
       "Bash(git add *)",
-      "Bash(git diff *)"
+      "Bash(git diff *)",
+      "Bash(git commit -q -m 'Initial hackathon scaffold: Next.js + FastAPI + Claude skills/MCP *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(python3 -m json.tool)",
+      "Bash(claude mcp *)"
     ]
   }
 }
