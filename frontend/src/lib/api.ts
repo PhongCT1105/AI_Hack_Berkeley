@@ -101,7 +101,8 @@ function subscribe(cb: () => void): () => void {
 
 export function saveResult(r: ScoreResponse): void {
   if (typeof window === "undefined") return;
-  cache = [r, ...snapshot().filter((x) => x.trace_id !== r.trace_id)];
+  const stamped = { ...r, analyzed_at: new Date().toISOString() };
+  cache = [stamped, ...snapshot().filter((x) => x.trace_id !== r.trace_id)];
   sessionStorage.setItem(STORE_KEY, JSON.stringify(cache));
   listeners.forEach((l) => l());
 }

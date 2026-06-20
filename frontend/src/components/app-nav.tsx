@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
+import { useResults } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -12,6 +13,11 @@ const links = [
 
 export function AppNav() {
   const pathname = usePathname();
+  const hasThreats = useResults().some((result) => result.recommendation === "AVOID");
+  const navLinks = [
+    ...links,
+    { href: "/threats", label: "Threat Feed", exact: false, indicator: hasThreats },
+  ];
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/80">
@@ -32,7 +38,7 @@ export function AppNav() {
 
         {/* Nav links */}
         <nav className="flex items-center gap-1">
-          {links.map((l) => {
+          {navLinks.map((l) => {
             const active = l.exact ? pathname === l.href : pathname.startsWith(l.href);
             return (
               <Link
@@ -45,7 +51,12 @@ export function AppNav() {
                     : "text-gray-500 hover:bg-gray-100 hover:text-gray-900",
                 )}
               >
-                {l.label}
+                <span className="inline-flex items-center gap-1.5">
+                  {l.label}
+                  {"indicator" in l && l.indicator && (
+                    <span className="size-1.5 rounded-full bg-red-500" />
+                  )}
+                </span>
               </Link>
             );
           })}
