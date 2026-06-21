@@ -6,13 +6,15 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 
-CompressionMethod = Literal["semantic_ir", "sentence_selector"]
+# The finance capsule is the production compressor.  The other two methods are
+# retained as demos/baselines so the UI can compare their output.
+CompressionMethod = Literal["finance_credibility", "semantic_ir", "sentence_selector"]
 
 
 class CompressionRequest(BaseModel):
     text: str = Field(..., min_length=1, description="Prompt, source text, or context to compress")
     query: str | None = Field(default=None, description="Task/query the compressed context must support")
-    method: CompressionMethod = "semantic_ir"
+    method: CompressionMethod = "finance_credibility"
 
 
 class CompressionResponse(BaseModel):

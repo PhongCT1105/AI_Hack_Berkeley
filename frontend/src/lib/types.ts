@@ -154,3 +154,64 @@ export interface ResearchResponse {
   cited_sources: ScoreResponse[];
   rejected_sources: ScoreResponse[];
 }
+
+// Mirrors the SSE events streamed by GET /api/workflow/stream
+// (app/services/workflow_demo.py) — each one is a real backend step, not a
+// scripted replay.
+export type WorkflowEvent =
+  | { type: "narrative"; text: string }
+  | { type: "tool_call"; tool: string; input: Record<string, unknown> }
+  | { type: "tool_result"; tool: string; output: Record<string, unknown> }
+  | { type: "final"; output: ResearchResponse }
+  | { type: "done" };
+
+// Mirrors the SSE events streamed by GET /api/comparison/stream
+// (app/services/comparison_demo.py) — heuristic + no compression ("weak")
+// vs. compression + a freshly-fit candidate model ("better"), scored on the
+// same collected page so only the pipeline differs, not the input data.
+export interface ComparisonSide {
+  label: "weak" | "better";
+  domain: string;
+  trust_score: number;
+  recommendation: Recommendation;
+  risk_tags: string[];
+  scorer_mode: string;
+  input_tokens: number;
+  output_tokens: number;
+  compression: { compression_ratio: number; total_tokens_saved: number; total_input_tokens: number; total_output_tokens: number; calls: number; page_chars_sent?: number } | null;
+  evidence_preview: string;
+  evidence_chars: number;
+  latency_ms: number;
+}
+
+export interface ComparisonSummary {
+  sources_compared: number;
+  totals: {
+    weak_input_tokens: number;
+    weak_output_tokens: number;
+    better_input_tokens: number;
+    better_output_tokens: number;
+  };
+  weak_total_tokens: number;
+  better_total_tokens: number;
+  tokens_saved: number;
+  disagreements: { url: string; domain: string; weak: string; better: string }[];
+  candidate_model: {
+    trained?: boolean;
+    note?: string;
+    n_labels_used?: number;
+    holdout_accuracy?: number;
+    baseline_accuracy?: number;
+    holdout_size?: number;
+    beats_baseline?: boolean;
+  };
+  discovery_error?: string | null;
+}
+
+export type ComparisonEvent =
+  | { type: "narrative"; text: string }
+  | { type: "tool_result"; tool?: string; output: Record<string, unknown> }
+  | { type: "row"; url: string; domain: string; weak: ComparisonSide; better: ComparisonSide }
+  | { type: "row_error"; url: string; error: string }
+  | { type: "summary"; output: ComparisonSummary }
+  | { type: "done" };

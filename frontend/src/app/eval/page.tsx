@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ThreeWayCompressionEvaluation } from "@/components/compression/three-way-evaluation";
 import { getEvalMetrics } from "@/lib/api";
 import type { EvalMetrics } from "@/lib/types";
 
@@ -205,6 +206,8 @@ export default function EvalPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ThreeWayCompressionEvaluation />
 
       {/* Held-out example table */}
       <Card className="mt-6 overflow-hidden">

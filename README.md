@@ -16,7 +16,8 @@ Exposed as a FastAPI endpoint *and* a FastMCP tool, so any MCP-capable agent can
 - **Engine** (`backend/app/`): pipeline `collector → extractor → features → ranker → capsule`.
   - Research discovery: Firecrawl Search only. Collection: Firecrawl Scrape with a direct HTTP
     fallback for a supplied source URL.
-  - Extractor + Capsule: **Claude** (Anthropic SDK) → heuristic/extractive fallback.
+  - Extractor: **Claude** (Anthropic SDK) → heuristic fallback. Capsule: domain-specific
+    **FinanceCredibilityCompressor** → extractive fallback.
   - Ranker: transparent **heuristic** baseline (per-feature contributions + verdicts).
 - **MCP server** (`backend/mcp_server.py`): FastMCP stdio tool `captain_america_score_source`.
 - **Frontend** (`frontend/src/app/`): dark observability-console UI —
@@ -190,6 +191,26 @@ preserving source URL, author, citations, dates, claims, risk tags, numbers, and
 - Demo: `http://localhost:3000/compress`
 - Eval: `backend/.venv/bin/python backend/scripts/eval_compression.py`
 - Claude API eval: `backend/.venv/bin/python backend/scripts/eval_claude_compression.py`
+
+### The Token Company automatic compression evaluation
+
+Set `TTC_API_KEY=ttc-...` in `backend/.env`. The existing async Anthropic
+clients are wrapped automatically, so their `messages.create(...)` calls do not
+change. Run the 30-query citation-task comparison with:
+
+```bash
+cd backend
+.venv/bin/python scripts/eval_ttc_compression.py
+```
+
+Each run compares three variants: the raw prompt, the AgentShield credibility
+capsule, and The Token Company Bear-2 compression. It saves every input, Claude
+output, real input token count, and quality metric to
+`backend/data/compression_evaluations/`. The latest run is also available from
+`GET /api/compress/evaluations/latest` for the `/compress` visualization.
+Quality is measured against the uncompressed output using exact
+citation-decision agreement, JSON validity, unigram F1, and precision/recall/F1
+for critical numbers, URLs, and named entities.
 
 ### Latest benchmarks (real Claude API token counts)
 

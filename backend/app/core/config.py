@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     # --- External services (all optional; absence triggers graceful fallback) ---
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-opus-4-8"
+    # The Token Company transparently compresses Anthropic messages before they
+    # reach Claude. Leave this unset to preserve the unwrapped client.
+    ttc_api_key: str | None = None
+    ttc_compression_model: str = "bear-2"
+    ttc_aggressiveness: float = Field(default=0.2, ge=0.0, le=1.0)
+    ttc_app_id: str = "captain-america"
 
     firecrawl_api_key: str | None = None
     firecrawl_api_url: str = "https://api.firecrawl.dev"
@@ -50,7 +56,35 @@ class Settings(BaseSettings):
     phoenix_collector_endpoint: str | None = None
     phoenix_api_key: str | None = None        # absent -> tracing no-op
 
+    # Arize AX (arize-otel). Preferred tracer when configured; falls back to
+    # Phoenix, then a no-op tracer. See app/core/observability.py.
+    arize_space_id: str | None = None
+    arize_api_key: str | None = None
+    arize_project_name: str = "captain-america"
+
     terac_api_key: str | None = None          # absent -> local-only stub arena
+    terac_api_url: str | None = None          # Terac's MCP endpoint (https://terac.com/api/mcp), not a plain REST base
+    terac_project_id: str | None = None       # Terac project to file auto-launched opportunities under
+
+    # Auto-launch: when a /api/score-source call misses the trust/citation
+    # threshold, fetch a fresh candidate source, insert it into Supabase
+    # (immediately labelable via organic /annotate traffic either way), and
+    # create a Terac opportunity. "draft" only creates it (free, no
+    # recruitment, no charge) and leaves the launch decision to a human;
+    # "launch" also calls terac_launch_draft_opportunity, which spends real
+    # money from the org balance. Bounded either way by a per-domain
+    # cooldown and a hard cap so a noisy domain can't spam drafts/spend.
+    terac_auto_launch_mode: str = "draft"  # "draft" | "launch"
+    terac_auto_launch_task_url: str = "https://example.com/terac/review-stub"
+    terac_auto_launch_participants: int = 1
+    # Terac enforces a $5 minimum study budget (duration_minutes x rate x
+    # num_participants); 5 minutes x 1 participant priced below that, so
+    # terac_create_opportunity rejected every draft. 10 minutes clears it
+    # with margin regardless of small rate changes.
+    terac_auto_launch_duration_minutes: int = 10
+    terac_auto_launch_max_total: int = 10
+    terac_auto_launch_cooldown_hours: int = 24
+    terac_auto_launch_store_path: str = "data/terac_auto_launch.json"
 
     # Supabase labeled-task export.  Use the publishable/anon key only when RLS
     # permits the intended read; otherwise use a server-side service-role key.
@@ -76,6 +110,9 @@ class Settings(BaseSettings):
     supabase_export_path: str = "data/supabase_labeled_tasks.jsonl"
     terac_store_path: str = "data/terac_store.json"
     score_history_path: str = "data/captain_america_history.json"
+    retrain_queue_path: str = "data/retrain_queue.json"
+    # Throttle for the auto-monitor background check fired from /api/score-source.
+    monitor_check_every_n_calls: int = 20
 
     @property
     def cors_origins_list(self) -> list[str]:
@@ -85,6 +122,10 @@ class Settings(BaseSettings):
     @property
     def has_anthropic(self) -> bool:
         return bool(self.anthropic_api_key)
+
+    @property
+    def has_ttc(self) -> bool:
+        return bool(self.ttc_api_key)
 
     @property
     def has_firecrawl(self) -> bool:
@@ -101,6 +142,10 @@ class Settings(BaseSettings):
     @property
     def has_phoenix(self) -> bool:
         return bool(self.phoenix_collector_endpoint)
+
+    @property
+    def has_arize(self) -> bool:
+        return bool(self.arize_space_id and self.arize_api_key)
 
     @property
     def has_terac(self) -> bool:

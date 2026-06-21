@@ -126,6 +126,13 @@ def recommend(trust_score: int) -> Recommendation:
     return Recommendation.AVOID
 
 
+def confidence(trust_score: int) -> float:
+    """0..1 distance from the nearest USE/CAUTION/AVOID decision boundary
+    (40, 70). Scorer-mode-agnostic — used by the degradation monitor and
+    surfaced as a trace attribute for Arize."""
+    return round(min(1.0, min(abs(trust_score - 40), abs(trust_score - 70)) / 30.0), 3)
+
+
 def score(f: SourceFeatures):
     """Return (trust_score, contributions, verdicts, risk_tags, scorer_mode).
 
