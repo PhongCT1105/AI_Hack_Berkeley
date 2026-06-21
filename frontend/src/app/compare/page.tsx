@@ -115,6 +115,9 @@ export default function ComparePage() {
                 <option value={2}>2 sources</option>
                 <option value={4}>4 sources</option>
                 <option value={6}>6 sources</option>
+                <option value={10}>10 sources</option>
+                <option value={20}>20 sources</option>
+                <option value={50}>50 sources</option>
               </select>
             </label>
             <button

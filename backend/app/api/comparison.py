@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/comparison", tags=["comparison"])
 async def stream(
     request: Request,
     prompt: str = Query(..., min_length=3),
-    max_sources: int = Query(6, ge=1, le=20),
+    max_sources: int = Query(6, ge=1, le=50),
 ) -> StreamingResponse:
     pipeline = request.app.state.pipeline
 
