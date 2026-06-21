@@ -1,0 +1,778 @@
+[
+  {
+    "received_at": "2026-06-21T01:47:38.042736+00:00",
+    "caller": "claude-mcp",
+    "request": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments"
+    },
+    "response": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments",
+      "domain": "best-stock-picks-now.com",
+      "trust_score": 0,
+      "recommendation": "AVOID",
+      "risk_tags": [
+        "no author",
+        "no citations",
+        "untrusted domain"
+      ],
+      "verdicts": [
+        {
+          "dimension": "domain",
+          "passed": false,
+          "detail": "Domain on the low-trust finance blocklist",
+          "weight": 35.0
+        },
+        {
+          "dimension": "authorship",
+          "passed": false,
+          "detail": "No identifiable author",
+          "weight": 12.0
+        },
+        {
+          "dimension": "citations",
+          "passed": false,
+          "detail": "Few or no citations / references",
+          "weight": 15.0
+        },
+        {
+          "dimension": "transport",
+          "passed": true,
+          "detail": "Served over HTTPS",
+          "weight": 3.0
+        },
+        {
+          "dimension": "ads",
+          "passed": true,
+          "detail": "Low ad density",
+          "weight": 3.0
+        },
+        {
+          "dimension": "framing",
+          "passed": true,
+          "detail": "Neutral, non-clickbait framing",
+          "weight": 2.0
+        }
+      ],
+      "claims": [],
+      "evidence_capsule": {
+        "compressed_text": "https://best-stock-picks-now.com/double-your-money",
+        "key_reasons": [
+          "Domain on the low-trust finance blocklist",
+          "Few or no citations / references",
+          "No identifiable author",
+          "Served over HTTPS",
+          "Low ad density"
+        ],
+        "token_estimate_before": 1,
+        "token_estimate_after": 12,
+        "method": "extractive_fallback"
+      },
+      "source_features": {
+        "https": true,
+        "has_author": false,
+        "has_citations": false,
+        "citation_count": 0,
+        "ad_density": 0.0,
+        "domain_reputation": 0.08,
+        "domain_listed": "block",
+        "clickbait_score": 0.0,
+        "recency_days": null,
+        "word_count": 0,
+        "outbound_link_count": 0,
+        "collector_mode": "httpx_fallback",
+        "extractor_mode": "heuristic_fallback"
+      },
+      "contributions": [
+        {
+          "feature": "domain",
+          "value": 0.08,
+          "points": -35.0
+        },
+        {
+          "feature": "has_author",
+          "value": false,
+          "points": -12.0
+        },
+        {
+          "feature": "has_citations",
+          "value": 0,
+          "points": -15.0
+        },
+        {
+          "feature": "https",
+          "value": true,
+          "points": 3.0
+        },
+        {
+          "feature": "ad_density",
+          "value": 0.0,
+          "points": 3.0
+        },
+        {
+          "feature": "clickbait",
+          "value": 0.0,
+          "points": 2.0
+        }
+      ],
+      "scorer_mode": "heuristic",
+      "degradations": [
+        "collector: httpx_fallback",
+        "collector error: [Errno 8] nodename nor servname provided, or not known",
+        "extractor: heuristic_fallback",
+        "ranker: heuristic (no Terac-trained model)",
+        "capsule: extractive_fallback"
+      ],
+      "latency_ms": 299,
+      "trace_id": "a0a657fc008b44ad8b2ca23707472ff7"
+    }
+  },
+  {
+    "received_at": "2026-06-21T00:12:03.958113+00:00",
+    "caller": "claude-mcp",
+    "request": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments"
+    },
+    "response": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments",
+      "domain": "best-stock-picks-now.com",
+      "trust_score": 0,
+      "recommendation": "AVOID",
+      "risk_tags": [
+        "no author",
+        "no citations",
+        "untrusted domain"
+      ],
+      "verdicts": [
+        {
+          "dimension": "domain",
+          "passed": false,
+          "detail": "Domain on the low-trust finance blocklist",
+          "weight": 35.0
+        },
+        {
+          "dimension": "authorship",
+          "passed": false,
+          "detail": "No identifiable author",
+          "weight": 12.0
+        },
+        {
+          "dimension": "citations",
+          "passed": false,
+          "detail": "Few or no citations / references",
+          "weight": 15.0
+        },
+        {
+          "dimension": "transport",
+          "passed": true,
+          "detail": "Served over HTTPS",
+          "weight": 3.0
+        },
+        {
+          "dimension": "ads",
+          "passed": true,
+          "detail": "Low ad density",
+          "weight": 3.0
+        },
+        {
+          "dimension": "framing",
+          "passed": true,
+          "detail": "Neutral, non-clickbait framing",
+          "weight": 2.0
+        }
+      ],
+      "claims": [],
+      "evidence_capsule": {
+        "compressed_text": "https://best-stock-picks-now.com/double-your-money",
+        "key_reasons": [
+          "Domain on the low-trust finance blocklist",
+          "Few or no citations / references",
+          "No identifiable author",
+          "Served over HTTPS",
+          "Low ad density"
+        ],
+        "token_estimate_before": 1,
+        "token_estimate_after": 12,
+        "method": "extractive_fallback"
+      },
+      "source_features": {
+        "https": true,
+        "has_author": false,
+        "has_citations": false,
+        "citation_count": 0,
+        "ad_density": 0.0,
+        "domain_reputation": 0.08,
+        "domain_listed": "block",
+        "clickbait_score": 0.0,
+        "recency_days": null,
+        "word_count": 0,
+        "outbound_link_count": 0,
+        "collector_mode": "httpx_fallback",
+        "extractor_mode": "heuristic_fallback"
+      },
+      "contributions": [
+        {
+          "feature": "domain",
+          "value": 0.08,
+          "points": -35.0
+        },
+        {
+          "feature": "has_author",
+          "value": false,
+          "points": -12.0
+        },
+        {
+          "feature": "has_citations",
+          "value": 0,
+          "points": -15.0
+        },
+        {
+          "feature": "https",
+          "value": true,
+          "points": 3.0
+        },
+        {
+          "feature": "ad_density",
+          "value": 0.0,
+          "points": 3.0
+        },
+        {
+          "feature": "clickbait",
+          "value": 0.0,
+          "points": 2.0
+        }
+      ],
+      "scorer_mode": "heuristic",
+      "degradations": [
+        "collector: httpx_fallback",
+        "collector error: [Errno 8] nodename nor servname provided, or not known",
+        "extractor: heuristic_fallback",
+        "ranker: heuristic (no Terac-trained model)",
+        "capsule: extractive_fallback"
+      ],
+      "latency_ms": 26,
+      "trace_id": "14e6174d509242cba069f04407ed17ed"
+    }
+  },
+  {
+    "received_at": "2026-06-21T00:11:10.644222+00:00",
+    "caller": "claude-mcp",
+    "request": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments for a consumer-facing finance agent."
+    },
+    "response": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments for a consumer-facing finance agent.",
+      "domain": "best-stock-picks-now.com",
+      "trust_score": 0,
+      "recommendation": "AVOID",
+      "risk_tags": [
+        "no author",
+        "no citations",
+        "untrusted domain"
+      ],
+      "verdicts": [
+        {
+          "dimension": "domain",
+          "passed": false,
+          "detail": "Domain on the low-trust finance blocklist",
+          "weight": 35.0
+        },
+        {
+          "dimension": "authorship",
+          "passed": false,
+          "detail": "No identifiable author",
+          "weight": 12.0
+        },
+        {
+          "dimension": "citations",
+          "passed": false,
+          "detail": "Few or no citations / references",
+          "weight": 15.0
+        },
+        {
+          "dimension": "transport",
+          "passed": true,
+          "detail": "Served over HTTPS",
+          "weight": 3.0
+        },
+        {
+          "dimension": "ads",
+          "passed": true,
+          "detail": "Low ad density",
+          "weight": 3.0
+        },
+        {
+          "dimension": "framing",
+          "passed": true,
+          "detail": "Neutral, non-clickbait framing",
+          "weight": 2.0
+        }
+      ],
+      "claims": [],
+      "evidence_capsule": {
+        "compressed_text": "https://best-stock-picks-now.com/double-your-money",
+        "key_reasons": [
+          "Domain on the low-trust finance blocklist",
+          "Few or no citations / references",
+          "No identifiable author",
+          "Served over HTTPS",
+          "Low ad density"
+        ],
+        "token_estimate_before": 1,
+        "token_estimate_after": 12,
+        "method": "extractive_fallback"
+      },
+      "source_features": {
+        "https": true,
+        "has_author": false,
+        "has_citations": false,
+        "citation_count": 0,
+        "ad_density": 0.0,
+        "domain_reputation": 0.08,
+        "domain_listed": "block",
+        "clickbait_score": 0.0,
+        "recency_days": null,
+        "word_count": 0,
+        "outbound_link_count": 0,
+        "collector_mode": "httpx_fallback",
+        "extractor_mode": "heuristic_fallback"
+      },
+      "contributions": [
+        {
+          "feature": "domain",
+          "value": 0.08,
+          "points": -35.0
+        },
+        {
+          "feature": "has_author",
+          "value": false,
+          "points": -12.0
+        },
+        {
+          "feature": "has_citations",
+          "value": 0,
+          "points": -15.0
+        },
+        {
+          "feature": "https",
+          "value": true,
+          "points": 3.0
+        },
+        {
+          "feature": "ad_density",
+          "value": 0.0,
+          "points": 3.0
+        },
+        {
+          "feature": "clickbait",
+          "value": 0.0,
+          "points": 2.0
+        }
+      ],
+      "scorer_mode": "heuristic",
+      "degradations": [
+        "collector: httpx_fallback",
+        "collector error: [Errno 8] nodename nor servname provided, or not known",
+        "extractor: heuristic_fallback",
+        "ranker: heuristic (no Terac-trained model)",
+        "capsule: extractive_fallback"
+      ],
+      "latency_ms": 13,
+      "trace_id": "a46fcc8f40c04ab2b980fde63593ab51"
+    }
+  },
+  {
+    "received_at": "2026-06-21T00:07:37.410522+00:00",
+    "caller": "claude-mcp",
+    "request": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments"
+    },
+    "response": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments",
+      "domain": "best-stock-picks-now.com",
+      "trust_score": 0,
+      "recommendation": "AVOID",
+      "risk_tags": [
+        "no author",
+        "no citations",
+        "untrusted domain"
+      ],
+      "verdicts": [
+        {
+          "dimension": "domain",
+          "passed": false,
+          "detail": "Domain on the low-trust finance blocklist",
+          "weight": 35.0
+        },
+        {
+          "dimension": "authorship",
+          "passed": false,
+          "detail": "No identifiable author",
+          "weight": 12.0
+        },
+        {
+          "dimension": "citations",
+          "passed": false,
+          "detail": "Few or no citations / references",
+          "weight": 15.0
+        },
+        {
+          "dimension": "transport",
+          "passed": true,
+          "detail": "Served over HTTPS",
+          "weight": 3.0
+        },
+        {
+          "dimension": "ads",
+          "passed": true,
+          "detail": "Low ad density",
+          "weight": 3.0
+        },
+        {
+          "dimension": "framing",
+          "passed": true,
+          "detail": "Neutral, non-clickbait framing",
+          "weight": 2.0
+        }
+      ],
+      "claims": [],
+      "evidence_capsule": {
+        "compressed_text": "https://best-stock-picks-now.com/double-your-money",
+        "key_reasons": [
+          "Domain on the low-trust finance blocklist",
+          "Few or no citations / references",
+          "No identifiable author",
+          "Served over HTTPS",
+          "Low ad density"
+        ],
+        "token_estimate_before": 1,
+        "token_estimate_after": 12,
+        "method": "extractive_fallback"
+      },
+      "source_features": {
+        "https": true,
+        "has_author": false,
+        "has_citations": false,
+        "citation_count": 0,
+        "ad_density": 0.0,
+        "domain_reputation": 0.08,
+        "domain_listed": "block",
+        "clickbait_score": 0.0,
+        "recency_days": null,
+        "word_count": 0,
+        "outbound_link_count": 0,
+        "collector_mode": "httpx_fallback",
+        "extractor_mode": "heuristic_fallback"
+      },
+      "contributions": [
+        {
+          "feature": "domain",
+          "value": 0.08,
+          "points": -35.0
+        },
+        {
+          "feature": "has_author",
+          "value": false,
+          "points": -12.0
+        },
+        {
+          "feature": "has_citations",
+          "value": 0,
+          "points": -15.0
+        },
+        {
+          "feature": "https",
+          "value": true,
+          "points": 3.0
+        },
+        {
+          "feature": "ad_density",
+          "value": 0.0,
+          "points": 3.0
+        },
+        {
+          "feature": "clickbait",
+          "value": 0.0,
+          "points": 2.0
+        }
+      ],
+      "scorer_mode": "heuristic",
+      "degradations": [
+        "collector: httpx_fallback",
+        "collector error: [Errno 8] nodename nor servname provided, or not known",
+        "extractor: heuristic_fallback",
+        "ranker: heuristic (no Terac-trained model)",
+        "capsule: extractive_fallback",
+        "served from cache"
+      ],
+      "latency_ms": 3179,
+      "trace_id": "24f5e2f5a0434f8e83a24bc0b7a3bacb"
+    }
+  },
+  {
+    "received_at": "2026-06-21T00:07:04.870031+00:00",
+    "caller": "claude-mcp",
+    "request": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments"
+    },
+    "response": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments",
+      "domain": "best-stock-picks-now.com",
+      "trust_score": 0,
+      "recommendation": "AVOID",
+      "risk_tags": [
+        "no author",
+        "no citations",
+        "untrusted domain"
+      ],
+      "verdicts": [
+        {
+          "dimension": "domain",
+          "passed": false,
+          "detail": "Domain on the low-trust finance blocklist",
+          "weight": 35.0
+        },
+        {
+          "dimension": "authorship",
+          "passed": false,
+          "detail": "No identifiable author",
+          "weight": 12.0
+        },
+        {
+          "dimension": "citations",
+          "passed": false,
+          "detail": "Few or no citations / references",
+          "weight": 15.0
+        },
+        {
+          "dimension": "transport",
+          "passed": true,
+          "detail": "Served over HTTPS",
+          "weight": 3.0
+        },
+        {
+          "dimension": "ads",
+          "passed": true,
+          "detail": "Low ad density",
+          "weight": 3.0
+        },
+        {
+          "dimension": "framing",
+          "passed": true,
+          "detail": "Neutral, non-clickbait framing",
+          "weight": 2.0
+        }
+      ],
+      "claims": [],
+      "evidence_capsule": {
+        "compressed_text": "https://best-stock-picks-now.com/double-your-money",
+        "key_reasons": [
+          "Domain on the low-trust finance blocklist",
+          "Few or no citations / references",
+          "No identifiable author",
+          "Served over HTTPS",
+          "Low ad density"
+        ],
+        "token_estimate_before": 1,
+        "token_estimate_after": 12,
+        "method": "extractive_fallback"
+      },
+      "source_features": {
+        "https": true,
+        "has_author": false,
+        "has_citations": false,
+        "citation_count": 0,
+        "ad_density": 0.0,
+        "domain_reputation": 0.08,
+        "domain_listed": "block",
+        "clickbait_score": 0.0,
+        "recency_days": null,
+        "word_count": 0,
+        "outbound_link_count": 0,
+        "collector_mode": "httpx_fallback",
+        "extractor_mode": "heuristic_fallback"
+      },
+      "contributions": [
+        {
+          "feature": "domain",
+          "value": 0.08,
+          "points": -35.0
+        },
+        {
+          "feature": "has_author",
+          "value": false,
+          "points": -12.0
+        },
+        {
+          "feature": "has_citations",
+          "value": 0,
+          "points": -15.0
+        },
+        {
+          "feature": "https",
+          "value": true,
+          "points": 3.0
+        },
+        {
+          "feature": "ad_density",
+          "value": 0.0,
+          "points": 3.0
+        },
+        {
+          "feature": "clickbait",
+          "value": 0.0,
+          "points": 2.0
+        }
+      ],
+      "scorer_mode": "heuristic",
+      "degradations": [
+        "collector: httpx_fallback",
+        "collector error: [Errno 8] nodename nor servname provided, or not known",
+        "extractor: heuristic_fallback",
+        "ranker: heuristic (no Terac-trained model)",
+        "capsule: extractive_fallback",
+        "served from cache"
+      ],
+      "latency_ms": 3179,
+      "trace_id": "e52a93da76fd48c3b22510dba4e5c082"
+    }
+  },
+  {
+    "received_at": "2026-06-21T00:03:48.351281+00:00",
+    "caller": "claude-mcp",
+    "request": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments"
+    },
+    "response": {
+      "url": "https://best-stock-picks-now.com/double-your-money",
+      "task": "Research low-risk retirement investments",
+      "domain": "best-stock-picks-now.com",
+      "trust_score": 0,
+      "recommendation": "AVOID",
+      "risk_tags": [
+        "no author",
+        "no citations",
+        "untrusted domain"
+      ],
+      "verdicts": [
+        {
+          "dimension": "domain",
+          "passed": false,
+          "detail": "Domain on the low-trust finance blocklist",
+          "weight": 35.0
+        },
+        {
+          "dimension": "authorship",
+          "passed": false,
+          "detail": "No identifiable author",
+          "weight": 12.0
+        },
+        {
+          "dimension": "citations",
+          "passed": false,
+          "detail": "Few or no citations / references",
+          "weight": 15.0
+        },
+        {
+          "dimension": "transport",
+          "passed": true,
+          "detail": "Served over HTTPS",
+          "weight": 3.0
+        },
+        {
+          "dimension": "ads",
+          "passed": true,
+          "detail": "Low ad density",
+          "weight": 3.0
+        },
+        {
+          "dimension": "framing",
+          "passed": true,
+          "detail": "Neutral, non-clickbait framing",
+          "weight": 2.0
+        }
+      ],
+      "claims": [],
+      "evidence_capsule": {
+        "compressed_text": "https://best-stock-picks-now.com/double-your-money",
+        "key_reasons": [
+          "Domain on the low-trust finance blocklist",
+          "Few or no citations / references",
+          "No identifiable author",
+          "Served over HTTPS",
+          "Low ad density"
+        ],
+        "token_estimate_before": 1,
+        "token_estimate_after": 12,
+        "method": "extractive_fallback"
+      },
+      "source_features": {
+        "https": true,
+        "has_author": false,
+        "has_citations": false,
+        "citation_count": 0,
+        "ad_density": 0.0,
+        "domain_reputation": 0.08,
+        "domain_listed": "block",
+        "clickbait_score": 0.0,
+        "recency_days": null,
+        "word_count": 0,
+        "outbound_link_count": 0,
+        "collector_mode": "httpx_fallback",
+        "extractor_mode": "heuristic_fallback"
+      },
+      "contributions": [
+        {
+          "feature": "domain",
+          "value": 0.08,
+          "points": -35.0
+        },
+        {
+          "feature": "has_author",
+          "value": false,
+          "points": -12.0
+        },
+        {
+          "feature": "has_citations",
+          "value": 0,
+          "points": -15.0
+        },
+        {
+          "feature": "https",
+          "value": true,
+          "points": 3.0
+        },
+        {
+          "feature": "ad_density",
+          "value": 0.0,
+          "points": 3.0
+        },
+        {
+          "feature": "clickbait",
+          "value": 0.0,
+          "points": 2.0
+        }
+      ],
+      "scorer_mode": "heuristic",
+      "degradations": [
+        "collector: httpx_fallback",
+        "collector error: [Errno 8] nodename nor servname provided, or not known",
+        "extractor: heuristic_fallback",
+        "ranker: heuristic (no Terac-trained model)",
+        "capsule: extractive_fallback"
+      ],
+      "latency_ms": 3179,
+      "trace_id": "fa1784f6f0284af29b566deeed1d735f"
+    }
+  }
+]

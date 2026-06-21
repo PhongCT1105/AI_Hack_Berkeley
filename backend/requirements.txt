@@ -5,6 +5,12 @@ pydantic-settings>=2.6.0
 python-dotenv>=1.0.1
 httpx>=0.27.0
 
+# Optional, uncomment as the project takes shape:
+# sqlalchemy>=2.0.0
+# psycopg[binary]>=3.2.0
+anthropic>=0.40.0
+# Optional for PromptCompressor LLMLingua-2 backend:
+# llmlingua>=0.2.2
 # --- Captain America engine ---
 selectolax>=0.3.21          # fast HTML parsing for the httpx fallback collector
 anthropic>=0.40.0           # Claude extractor + credibility capsule (optional, has_anthropic)
