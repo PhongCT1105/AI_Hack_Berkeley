@@ -10,6 +10,14 @@
       "env": {
         "API_KEY": "${MAGIC_21ST_API_KEY}"
       }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
     }
   }
 }
