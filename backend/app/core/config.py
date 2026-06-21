@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     redis_url: str | None = None              # absent -> in-memory cache
 
     sentry_dsn: str | None = None             # absent -> Sentry disabled
+    sentry_traces_sample_rate: float = 1.0
+    sentry_send_default_pii: bool = False
     phoenix_collector_endpoint: str | None = None
     phoenix_api_key: str | None = None        # absent -> tracing no-op
 

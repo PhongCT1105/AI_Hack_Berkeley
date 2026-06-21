@@ -19,10 +19,11 @@ from app.services.extractor import Extractor
 from app.services.history import ScoreHistory
 from app.services.pipeline import Pipeline
 
+init_observability()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    init_observability()
     cache = Cache()
     app.state.cache = cache
     app.state.score_history = ScoreHistory(settings.score_history_path)

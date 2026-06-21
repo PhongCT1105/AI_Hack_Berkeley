@@ -33,18 +33,22 @@ class _NoOpTracer:
 
 
 def init_observability() -> None:
-    """Call once at startup (FastAPI lifespan). Safe to call with no keys."""
+    """Initialize Sentry before FastAPI app creation; Phoenix can follow at startup."""
     global _initialized, _tracer
     if _initialized:
         return
     _initialized = True
 
-    # --- Sentry: five lines, only if a DSN is configured ---
+    # --- Sentry: only if a DSN is configured ---
     if settings.has_sentry:
         try:
             import sentry_sdk
 
-            sentry_sdk.init(dsn=settings.sentry_dsn, traces_sample_rate=1.0)
+            sentry_sdk.init(
+                dsn=settings.sentry_dsn,
+                traces_sample_rate=settings.sentry_traces_sample_rate,
+                send_default_pii=settings.sentry_send_default_pii,
+            )
             logger.info("Sentry initialized")
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Sentry init failed, continuing without it: %s", exc)
