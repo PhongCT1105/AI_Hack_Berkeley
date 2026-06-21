@@ -249,47 +249,6 @@ export default function EvalPage() {
           </table>
         </div>
       </Card>
-
-      {/* Compression section — console-theme terminal treatment */}
-      <Card className="mt-6 overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="flex flex-col justify-center border-r border-border p-6">
-            <h3 className="mb-2 flex items-center gap-2 text-lg font-bold text-foreground">
-              <Sparkles className="size-4 text-primary" />
-              Credibility Capsules
-            </h3>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Messy webpages are distilled into decision-relevant evidence, drastically reducing token
-              overhead while retaining the signal an agent needs to decide.
-            </p>
-            <div className="flex flex-wrap items-end gap-4">
-              <div>
-                <p className="text-xs font-semibold tracking-wide text-muted-foreground">Raw</p>
-                <p className="font-mono text-base font-semibold text-foreground">{metrics.raw_tokens_example.toLocaleString()} tokens</p>
-              </div>
-              <span className="text-muted-foreground/50">→</span>
-              <div>
-                <p className="text-xs font-semibold tracking-wide text-primary">Capsule</p>
-                <p className="font-mono text-base font-semibold text-primary">{metrics.capsule_tokens_example.toLocaleString()} tokens</p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between rounded border border-primary/20 bg-secondary/40 px-3.5 py-2.5">
-              <span className="text-xs font-semibold tracking-wide text-primary">Reduction rate</span>
-              <Badge tone="purple" className="text-sm">−{metrics.avg_token_reduction_pct}%</Badge>
-            </div>
-          </div>
-          <div className="console-theme p-6 font-mono text-xs">
-            <div className="mb-3 flex items-center gap-2 text-white/40">
-              <Sparkles className="size-3.5" />
-              <span>COMPRESSION_LOG_TRACE</span>
-            </div>
-            <p className="text-indigo-300">&gt; analyzing_structure...</p>
-            <p className="text-white/50">&gt; extracting_critical_entities: [&quot;source&quot;, &quot;claims&quot;, &quot;citations&quot;]</p>
-            <p className="text-indigo-300">&gt; distilling_arguments: [{metrics.avg_token_reduction_pct}% reduction]</p>
-            <p className="mt-3 text-white/30">NOISY_WEBPAGE_RAW → SAFE_EVIDENCE_CAPSULE</p>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 }

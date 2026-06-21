@@ -41,12 +41,21 @@ def init_observability() -> None:
         return
     _initialized = True
 
-    # --- Sentry: five lines, only if a DSN is configured ---
+    # --- Sentry: only if a DSN is configured. send_default_pii stays off by
+    # default since this product handles finance research queries; flip it
+    # on deliberately if you need request headers/IPs attached to events. ---
     if settings.has_sentry:
         try:
             import sentry_sdk
 
-            sentry_sdk.init(dsn=settings.sentry_dsn, traces_sample_rate=1.0)
+            sentry_sdk.init(
+                dsn=settings.sentry_dsn,
+                send_default_pii=False,
+                enable_logs=True,
+                traces_sample_rate=1.0,
+                profile_session_sample_rate=1.0,
+                profile_lifecycle="trace",
+            )
             logger.info("Sentry initialized")
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Sentry init failed, continuing without it: %s", exc)

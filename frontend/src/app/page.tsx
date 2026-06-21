@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -9,9 +9,21 @@ import {
 } from "lucide-react";
 import { ComicBadge } from "@/components/comic/comic-badge";
 import { ComicPageHeader } from "@/components/comic/comic-page-header";
+import { McpInstall } from "@/components/comic/mcp-install";
 import { Card, CardContent } from "@/components/ui/card";
-import { useResults } from "@/lib/api";
+import { getSystemHealth, useResults, type SentryIssue } from "@/lib/api";
 import type { Recommendation, ScoreResponse } from "@/lib/types";
+
+const SENTRY_ORG_SLUG = "worcester-polytechnic-insti-6p";
+
+function timeAgo(iso: string | null): string {
+  if (!iso) return "";
+  const seconds = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
 
 const FALLBACK_FEED = [
   { domain: "investor.nvidia.com", score: 96, kind: "USE" as const, note: "Official investor relations portal" },
@@ -43,6 +55,12 @@ function formatTime(index: number) {
 export default function MonitorPage() {
   const results = useResults();
   const [paused, setPaused] = useState(false);
+  const [health, setHealth] = useState<{ configured: boolean; issues: SentryIssue[] } | null>(null);
+
+  useEffect(() => {
+    void getSystemHealth().then(setHealth);
+  }, []);
+
   const visibleResults = useMemo(() => results.slice(0, 6), [results]);
   const feed = visibleResults.length ? visibleResults : FALLBACK_FEED;
   const blocked = results.filter((result) => result.recommendation === "AVOID");
@@ -99,6 +117,9 @@ export default function MonitorPage() {
               controls
             />
           </div>
+        </div>
+        <div className="mx-auto mt-10 max-w-7xl">
+          <McpInstall />
         </div>
       </section>
 
@@ -178,15 +199,44 @@ export default function MonitorPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-red-200 bg-red-50/30">
+          <Card className={health?.issues.length ? "border-red-200 bg-red-50/30" : undefined}>
             <CardContent className="pt-5">
-              <div className="flex items-center justify-between"><h3 className="text-[11px] font-semibold uppercase tracking-wide text-destructive">System health</h3><span className="rounded border border-red-300 px-1 text-[9px] font-bold text-destructive">LIVE</span></div>
-              <div className="mt-3 space-y-2 font-mono text-[10px] text-muted-foreground">
-                <HealthEvent tone="bg-destructive" label="API timeout [504]" time="2m ago" />
-                <HealthEvent tone="bg-amber-500" label="Crawl failure: Bloomberg" time="15m ago" />
-                <HealthEvent tone="bg-primary" label="Kernel refresh" time="1h ago" />
+              <div className="flex items-center justify-between">
+                <h3 className={`text-[11px] font-semibold uppercase tracking-wide ${health?.issues.length ? "text-destructive" : "text-muted-foreground"}`}>
+                  System health (Sentry)
+                </h3>
+                {health?.configured && (
+                  <span className={`rounded border px-1 text-[9px] font-bold ${health.issues.length ? "border-red-300 text-destructive" : "border-emerald-300 text-emerald-700"}`}>
+                    LIVE
+                  </span>
+                )}
               </div>
-              <Link href="/threats" className="mt-4 flex h-8 items-center justify-center rounded bg-red-100 text-[10px] font-semibold uppercase tracking-wide text-destructive active:translate-y-px">View sentry logs</Link>
+              <div className="mt-3 space-y-2 font-mono text-[10px] text-muted-foreground">
+                {health === null ? (
+                  <p>Checking…</p>
+                ) : !health.configured ? (
+                  <p>Sentry not configured on the backend (SENTRY_AUTH_TOKEN unset).</p>
+                ) : health.issues.length === 0 ? (
+                  <p className="text-emerald-700">No unresolved issues in the last 24h.</p>
+                ) : (
+                  health.issues.map((issue) => (
+                    <HealthEvent
+                      key={issue.permalink ?? issue.title}
+                      tone={issue.level === "error" ? "bg-destructive" : "bg-amber-500"}
+                      label={`${issue.title} (${issue.project})`}
+                      time={timeAgo(issue.last_seen)}
+                    />
+                  ))
+                )}
+              </div>
+              <a
+                href={`https://${SENTRY_ORG_SLUG}.sentry.io/issues/`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 flex h-8 items-center justify-center rounded bg-red-100 text-[10px] font-semibold uppercase tracking-wide text-destructive active:translate-y-px"
+              >
+                View Sentry issues
+              </a>
             </CardContent>
           </Card>
         </aside>

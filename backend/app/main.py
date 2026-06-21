@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import comparison, compress
 from app.api.crawl import router as crawl_router
-from app.api import demo, history, monitor, research, score, terac, workflow
+from app.api import demo, history, monitor, research, score, system_health, terac, workflow
 from app.core.cache import Cache
 from app.core.config import settings
 from app.core.observability import init_observability, instrument_fastapi_app
@@ -56,6 +56,7 @@ app.include_router(research.router)
 app.include_router(monitor.router)
 app.include_router(workflow.router)
 app.include_router(comparison.router)
+app.include_router(system_health.router)
 
 
 @app.get("/")

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Captain Ddoski">
+  <defs>
+    <linearGradient id="shield" x1="10" y1="6" x2="54" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset=".5" stop-color="#1464d9"/>
+      <stop offset="1" stop-color="#0b2575"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#071a46"/>
+  <path d="M32 5 55 14v17c0 14-9 24-23 29C18 55 9 45 9 31V14L32 5Z" fill="url(#shield)" stroke="#b9efff" stroke-width="2.5"/>
+  <path d="M32 12 48 18v13c0 10-6.2 17.5-16 22-9.8-4.5-16-12-16-22V18l16-6Z" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.5"/>
+  <path d="M23 20h9.5c7.1 0 11.5 4.6 11.5 12s-4.4 12-11.5 12H23V20Zm8.9 6.1H29v11.8h2.9c3.7 0 5.9-2.2 5.9-5.9s-2.2-5.9-5.9-5.9Z" fill="#fff"/>
+  <path d="M18.5 10.2 32 5l13.5 5.2-3.4 2.5L32 9l-10.1 3.7-3.4-2.5Z" fill="#ef4444"/>
+</svg>

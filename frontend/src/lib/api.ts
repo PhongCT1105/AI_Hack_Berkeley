@@ -76,6 +76,27 @@ export async function runDemo(task: string, urls: string[]): Promise<DemoSource[
   }
 }
 
+export interface SentryIssue {
+  project: string;
+  title: string | null;
+  level: string | null;
+  status: string | null;
+  culprit: string | null;
+  count: string | null;
+  last_seen: string | null;
+  permalink: string | null;
+}
+
+/** Real Sentry issues, or `configured: false` when no SENTRY_AUTH_TOKEN is
+ * set on the backend — never fabricated placeholder events. */
+export async function getSystemHealth(): Promise<{ configured: boolean; issues: SentryIssue[] }> {
+  try {
+    return await json(await fetch(`${API_URL}/api/system-health`));
+  } catch {
+    return { configured: false, issues: [] };
+  }
+}
+
 /** Returns evaluation metrics with a deterministic fallback for local UI work. */
 export async function getEvalMetrics(): Promise<EvalMetrics> {
   try {

@@ -22,7 +22,7 @@ the-token-company>=0.3.2    # Transparent Anthropic/OpenAI prompt compression wr
 # Redis cache + rolling reputation:
 # redis>=5.2.0
 # Observability:
-# sentry-sdk>=2.18.0
+sentry-sdk>=2.18.0
 # arize-phoenix-otel>=0.6.0
 arize-otel>=0.6.0
 openinference-instrumentation-anthropic>=1.0.6

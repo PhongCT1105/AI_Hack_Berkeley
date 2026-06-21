@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     redis_url: str | None = None              # absent -> in-memory cache
 
     sentry_dsn: str | None = None             # absent -> Sentry disabled
+    # Org-level Auth Token (Settings -> Auth Tokens; separate from sentry_dsn,
+    # which is for the SDK to *send* events). Used server-side to read recent
+    # issues for the home page's System Health panel.
+    sentry_auth_token: str | None = None
+    sentry_org_slug: str | None = None
     phoenix_collector_endpoint: str | None = None
     phoenix_api_key: str | None = None        # absent -> tracing no-op
 
@@ -138,6 +143,10 @@ class Settings(BaseSettings):
     @property
     def has_sentry(self) -> bool:
         return bool(self.sentry_dsn)
+
+    @property
+    def has_sentry_api(self) -> bool:
+        return bool(self.sentry_auth_token and self.sentry_org_slug)
 
     @property
     def has_phoenix(self) -> bool:
