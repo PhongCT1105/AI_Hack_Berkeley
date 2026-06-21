@@ -5,6 +5,7 @@ heuristic ScoreResponse with zero keys set. Each service checks a `has_*`
 capability flag (never a raw key) and falls back to an in-process path.
 """
 from pathlib import Path
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +18,18 @@ class Settings(BaseSettings):
     app_name: str = "AgentShield API"
     debug: bool = True
 
+    @field_validator("debug", mode="before")
+    @classmethod
+    def parse_debug_environment(cls, value: object) -> object:
+        """Accept conventional deployment names in addition to boolean strings."""
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"development", "dev", "debug"}:
+                return True
+            if normalized in {"production", "prod", "release"}:
+                return False
+        return value
+
     # Comma-separated list of allowed CORS origins (frontend dev server, etc.)
     cors_origins: str = "http://localhost:3000"
 
@@ -28,6 +41,8 @@ class Settings(BaseSettings):
     browserbase_project_id: str | None = None
     browserbase_page_timeout_ms: int = 60000
     browserbase_max_text_chars: int = 12000
+    research_max_sources: int = 100
+    research_concurrency: int = 6
 
     redis_url: str | None = None              # absent -> in-memory cache
 
@@ -37,10 +52,25 @@ class Settings(BaseSettings):
 
     terac_api_key: str | None = None          # absent -> local-only stub arena
 
+    # Supabase labeled-task export.  Use the publishable/anon key only when RLS
+    # permits the intended read; otherwise use a server-side service-role key.
+    # Keep this key in backend/.env, never in the frontend.
+    supabase_url: str | None = None
+    supabase_key: str | None = None
+    supabase_table: str = "tasks"
+    supabase_label_column: str = "can_ai_cite"
+    # Labels live in a separate annotations table (many rows per task, majority
+    # vote needed) rather than inline on the task row.
+    supabase_tasks_table: str = "source_claim_tasks"
+    supabase_annotations_table: str = "simple_claim_annotations"
+    supabase_join_key: str = "task_id"
+
     # --- Tunables ---
     cache_ttl_seconds: int = 86400
     capsule_token_budget: int = 220
     ml_model_path: str = "data/terac_model.joblib"
+    citation_model_path: str = "data/sourceguard_citation_classifier.joblib"
+    supabase_export_path: str = "data/supabase_labeled_tasks.jsonl"
     terac_store_path: str = "data/terac_store.json"
     score_history_path: str = "data/score_history.json"
 

@@ -155,12 +155,12 @@ export default function ThreatFeedPage() {
     <div className="mx-auto max-w-7xl px-6 py-8">
       <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="flex items-center gap-2.5 text-xl font-semibold text-gray-900">
-            <Radar className="size-5 text-violet-600" />
+          <h1 className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
+            <Radar className="size-5 text-primary" />
             Threat Feed
           </h1>
-          <p className="mt-0.5 text-sm text-gray-500">
-            Session monitor for finance sources AgentShield recommends agents avoid.
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Session monitor for finance sources Captain America recommends agents avoid.
           </p>
         </div>
         <Badge tone={flagged.length > 0 ? "danger" : "success"}>
@@ -169,30 +169,30 @@ export default function ThreatFeedPage() {
       </div>
 
       {flagged.length === 0 ? (
-        <Card className="border-violet-100 bg-white shadow-sm">
+        <Card className="glass-panel">
           <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
-            <span className="flex size-12 items-center justify-center rounded-full bg-violet-50">
-              <ShieldAlert className="size-5 text-violet-400" />
+            <span className="flex size-12 items-center justify-center rounded-full bg-secondary">
+              <ShieldAlert className="size-5 text-primary" />
             </span>
-            <p className="text-sm font-medium text-gray-700">No flagged sources yet</p>
-            <p className="max-w-md text-xs text-gray-400">
+            <p className="text-sm font-medium text-foreground">No flagged sources yet</p>
+            <p className="max-w-md text-xs text-muted-foreground">
               Sources marked AVOID will appear here as grouped domain threats after analysis.
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6">
-          <Card className="overflow-hidden border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-5 py-3">
-              <span className="text-sm font-semibold text-gray-800">Flagged Domains</span>
-              <span className="text-xs text-gray-400">
+          <Card className="overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border bg-muted px-5 py-3">
+              <span className="text-sm font-semibold text-foreground">Flagged Domains</span>
+              <span className="text-xs text-muted-foreground">
                 {threats.length} domain{threats.length === 1 ? "" : "s"}
               </span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left text-xs font-medium uppercase tracking-wide text-gray-400">
+                  <tr className="border-b border-border text-left text-xs font-semibold tracking-wide text-muted-foreground">
                     <th className="px-5 py-3">Domain</th>
                     <th className="px-5 py-3">Risk tags</th>
                     <th className="px-5 py-3">Trust score</th>
@@ -200,16 +200,16 @@ export default function ThreatFeedPage() {
                     <th className="px-5 py-3">First seen</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-border/60">
                   {threats.map((threat) => (
-                    <tr key={threat.domain} className="transition-colors hover:bg-violet-50/60">
+                    <tr key={threat.domain} className="transition-colors hover:bg-secondary/30">
                       <td className="px-5 py-3.5">
-                        <div className="font-medium text-gray-900">{threat.domain}</div>
+                        <div className="font-medium text-foreground">{threat.domain}</div>
                       </td>
                       <td className="px-5 py-3.5">
                         <div className="flex max-w-lg flex-wrap gap-1">
                           {threat.riskTags.length === 0 ? (
-                            <span className="text-xs text-gray-300">—</span>
+                            <span className="text-xs text-muted-foreground/60">—</span>
                           ) : (
                             threat.riskTags.slice(0, 4).map((tag) => (
                               <Badge key={tag} tone="danger">
@@ -221,7 +221,7 @@ export default function ThreatFeedPage() {
                       </td>
                       <td className="px-5 py-3.5">
                         {threat.trustScore === null ? (
-                          <span className="text-xs text-gray-300">—</span>
+                          <span className="text-xs text-muted-foreground/60">—</span>
                         ) : (
                           <div className="flex items-center gap-2.5">
                             <span
@@ -231,7 +231,7 @@ export default function ThreatFeedPage() {
                             >
                               {threat.trustScore}
                             </span>
-                            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-100">
+                            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
                               <div
                                 className="h-full rounded-full"
                                 style={{
@@ -243,10 +243,10 @@ export default function ThreatFeedPage() {
                           </div>
                         )}
                       </td>
-                      <td className="px-5 py-3.5 font-medium tabular-nums text-gray-700">
+                      <td className="px-5 py-3.5 font-medium tabular-nums text-foreground">
                         {threat.timesSeen}
                       </td>
-                      <td className="px-5 py-3.5 text-gray-500">
+                      <td className="px-5 py-3.5 text-muted-foreground">
                         {formatFirstSeen(threat.firstSeen)}
                       </td>
                     </tr>
@@ -257,16 +257,16 @@ export default function ThreatFeedPage() {
           </Card>
 
           <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-            <Card className="border-gray-200 shadow-sm">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-900">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <AlertTriangle className="size-4 text-red-500" />
                   Common patterns
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {commonTags.length === 0 ? (
-                  <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-6 text-center text-sm text-gray-400">
+                  <p className="rounded border border-border bg-muted px-3 py-6 text-center text-sm text-muted-foreground">
                     No risk tags were attached to flagged sources.
                   </p>
                 ) : (
@@ -278,18 +278,18 @@ export default function ThreatFeedPage() {
                       return (
                         <div key={item.tag}>
                           <div className="mb-1.5 flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium text-gray-800">{item.tag}</span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-sm font-medium text-foreground">{item.tag}</span>
+                            <span className="text-xs text-muted-foreground">
                               {percent}% of flagged sources
                             </span>
                           </div>
-                          <div className="h-2.5 overflow-hidden rounded-full bg-gray-100">
+                          <div className="h-2.5 overflow-hidden rounded-full bg-muted">
                             <div
-                              className="h-full rounded-full bg-linear-to-r from-red-500 to-violet-600"
+                              className="h-full rounded-full bg-linear-to-r from-red-500 to-primary"
                               style={{ width }}
                             />
                           </div>
-                          <p className="mt-1 text-xs text-gray-400">
+                          <p className="mt-1 text-xs text-muted-foreground/70">
                             {item.tag}: {percent}% of flagged sources
                           </p>
                         </div>
@@ -300,9 +300,9 @@ export default function ThreatFeedPage() {
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden border-gray-200 shadow-sm">
-              <CardHeader className="border-b border-gray-100 bg-gray-50">
-                <CardTitle className="flex items-center gap-2 text-gray-900">
+            <Card className="overflow-hidden">
+              <CardHeader className="bg-muted">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <Ban className="size-4 text-red-500" />
                   Finance blocklist domains
                 </CardTitle>
@@ -310,15 +310,15 @@ export default function ThreatFeedPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-100 text-left text-xs font-medium uppercase tracking-wide text-gray-400">
+                    <tr className="border-b border-border text-left text-xs font-semibold tracking-wide text-muted-foreground">
                       <th className="px-5 py-3">Domain</th>
                       <th className="px-5 py-3">Prior</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-border/60">
                     {FINANCE_BLOCKLIST.map((item) => (
                       <tr key={item.domain}>
-                        <td className="px-5 py-3.5 font-medium text-gray-900">{item.domain}</td>
+                        <td className="px-5 py-3.5 font-medium text-foreground">{item.domain}</td>
                         <td className="px-5 py-3.5 text-red-600 tabular-nums">
                           {Math.round(item.reputation * 100)}%
                         </td>

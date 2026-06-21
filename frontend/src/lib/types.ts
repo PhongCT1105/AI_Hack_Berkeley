@@ -96,3 +96,82 @@ export interface ModelStatus {
   active_scorer: string;
   note: string | null;
 }
+
+// Demo pipeline
+export type DemoRecommendation = "cite" | "use_with_caution" | "do_not_cite";
+export type Quality = "strong" | "medium" | "weak";
+
+export interface DemoSource {
+  id: string;
+  url: string;
+  domain: string;
+  title: string;
+  sourceType: string;
+  trustScore: number;
+  baseScore: number;
+  trainedScore: number;
+  recommendation: DemoRecommendation;
+  riskTags: string[];
+  claims: string[];
+  evidenceQuality: Quality;
+  citationQuality: Quality;
+  capsule: {
+    compressed_text: string;
+    key_reasons: string[];
+    method: string;
+  };
+  rawTokens: number;
+  capsuleTokens: number;
+  compressionPct: number;
+}
+
+export interface EvalExample {
+  task: string;
+  source_a: string;
+  source_b: string;
+  human_preferred: "a" | "b";
+  base_predicted: "a" | "b";
+  trained_predicted: "a" | "b";
+  result: "both_right" | "base_wrong_trained_right" | "both_wrong";
+}
+
+export interface EvalMetrics {
+  base_accuracy: number;
+  trained_accuracy: number;
+  improvement_pct: number;
+  held_out_examples: number;
+  human_preference_match: number;
+  bad_source_filtering_precision: number;
+  cite_do_not_cite_accuracy: number;
+  avg_token_reduction_pct: number;
+  raw_tokens_example: number;
+  capsule_tokens_example: number;
+  examples: EvalExample[];
+}
+
+export interface ArenaSource {
+  domain: string;
+  title: string;
+  capsuleSummary: string;
+  riskTags: string[];
+  citationQuality: Quality;
+}
+
+export interface ArenaPair {
+  pair_id: string;
+  task: string;
+  a: ArenaSource;
+  b: ArenaSource;
+}
+
+export interface ResearchResponse {
+  prompt: string;
+  search_query: string;
+  discovered_count: number;
+  inspected_count: number;
+  agent_mode: string;
+  search_mode: string;
+  answer: string;
+  cited_sources: ScoreResponse[];
+  rejected_sources: ScoreResponse[];
+}

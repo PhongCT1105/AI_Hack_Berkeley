@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote_plus, urljoin, urlparse
 
 import httpx
 
@@ -39,6 +39,37 @@ class CollectResult:
 
 
 class Collector:
+    async def search(self, query: str, limit: int = 100) -> tuple[list[str], str]:
+        """Discover public web results using Browserbase when configured.
+
+        Browserbase is used for the JavaScript search page; a direct HTTP fetch
+        provides a degraded local path when credentials are unavailable.
+        """
+        mode = "httpx_search_fallback"
+        blocked_hosts = {"bing.com", "microsoft.com", "msn.com", "r.bing.com"}
+        urls: list[str] = []
+        for offset in range(0, limit, 50):
+            search_url = f"https://www.bing.com/search?q={quote_plus(query)}&count=50&first={offset + 1}"
+            html = ""
+            if settings.has_browserbase:
+                try:
+                    result = await self._collect_browserbase(search_url)
+                    html, mode = result.html, "browserbase_search"
+                except Exception as exc:
+                    logger.warning("Browserbase search failed, falling back to httpx: %s", exc)
+            if not html:
+                result = await self._collect_httpx(search_url)
+                html = result.html
+            for candidate in _extract_links(html, search_url):
+                host = urlparse(candidate).hostname or ""
+                if any(host == blocked or host.endswith(f".{blocked}") for blocked in blocked_hosts):
+                    continue
+                if candidate not in urls:
+                    urls.append(candidate)
+                if len(urls) >= limit:
+                    return urls, mode
+        return urls, mode
+
     async def collect(self, url: str) -> CollectResult:
         if not url.startswith(("http://", "https://")):
             url = "https://" + url

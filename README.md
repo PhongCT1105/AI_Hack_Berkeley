@@ -23,6 +23,38 @@ Exposed as a FastAPI endpoint *and* a FastMCP tool, so any MCP-capable agent can
   Terac API/MCP + model training is a teammate's follow-up — see the `# TODO(terac):` notes in
   `backend/app/ml/trainer.py` and `terac_store.py`. The heuristic stays the active scorer.
 
+## Train from Supabase labels
+
+The labeled Supabase tasks train a separate claim/source **citation-usability** model. This is
+intentionally separate from the URL-feature ranker: Supabase labels describe whether a particular
+claim and its evidence can be used, not just whether a domain has strong URL-level signals.
+
+Set these server-only values in `backend/.env` (the table and label column must match your
+Supabase schema):
+
+```dotenv
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_KEY=<anon-key-with-RLS-read-access-or-service-role-key>
+SUPABASE_TABLE=sourceguard_tasks
+SUPABASE_LABEL_COLUMN=would_ai_cite
+```
+
+Then install the backend requirements, export only rows with a recognized label, and train:
+
+```bash
+cd backend
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python scripts/pull_supabase_labels.py \
+  --table sourceguard_tasks --label-column would_ai_cite
+.venv/bin/python scripts/train_citation_classifier.py \
+  --label-column would_ai_cite
+```
+
+The export is written to `backend/data/supabase_labeled_tasks.jsonl` and the versioned model bundle
+to `backend/data/sourceguard_citation_classifier.joblib`. The training command prints held-out
+accuracy, usable-class F1, and ROC-AUC. It refuses to train on fewer than 20 usable examples or a
+one-class label set.
+
 ## Quick start
 
 ```bash
