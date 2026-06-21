@@ -5,7 +5,7 @@ heuristic ScoreResponse with zero keys set. Each service checks a `has_*`
 capability flag (never a raw key) and falls back to an in-process path.
 """
 from pathlib import Path
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,7 +15,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[2]
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 
-    app_name: str = "AgentShield API"
+    app_name: str = "Captain America API"
     debug: bool = True
 
     @field_validator("debug", mode="before")
@@ -37,10 +37,10 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None
     anthropic_model: str = "claude-opus-4-8"
 
-    browserbase_api_key: str | None = None
-    browserbase_project_id: str | None = None
-    browserbase_page_timeout_ms: int = 60000
-    browserbase_max_text_chars: int = 12000
+    firecrawl_api_key: str | None = None
+    firecrawl_api_url: str = "https://api.firecrawl.dev"
+    firecrawl_page_timeout_ms: int = 60000
+    firecrawl_max_text_chars: int = 12000
     research_max_sources: int = 100
     research_concurrency: int = 6
 
@@ -70,9 +70,12 @@ class Settings(BaseSettings):
     capsule_token_budget: int = 220
     ml_model_path: str = "data/terac_model.joblib"
     citation_model_path: str = "data/sourceguard_citation_classifier.joblib"
+    # Match the trained classifier's decision boundary. Raise only after
+    # calibration on a held-out deployment-like citation set.
+    citation_model_min_probability: float = Field(default=0.50, ge=0.5, le=0.95)
     supabase_export_path: str = "data/supabase_labeled_tasks.jsonl"
     terac_store_path: str = "data/terac_store.json"
-    score_history_path: str = "data/score_history.json"
+    score_history_path: str = "data/captain_america_history.json"
 
     @property
     def cors_origins_list(self) -> list[str]:
@@ -84,8 +87,8 @@ class Settings(BaseSettings):
         return bool(self.anthropic_api_key)
 
     @property
-    def has_browserbase(self) -> bool:
-        return bool(self.browserbase_api_key and self.browserbase_project_id)
+    def has_firecrawl(self) -> bool:
+        return bool(self.firecrawl_api_key)
 
     @property
     def has_redis(self) -> bool:

@@ -1,4 +1,4 @@
-"""AgentShield FastAPI entrypoint.
+"""Captain America FastAPI entrypoint.
 
 Credibility infrastructure for AI agents (finance domain). Boots and serves a
 valid heuristic verdict with zero API keys; every integration degrades gracefully.
@@ -13,7 +13,7 @@ from app.api import demo, history, research, score, terac
 from app.core.cache import Cache
 from app.core.config import settings
 from app.core.observability import init_observability
-from app.ml import model_registry
+from app.ml import citation_model_registry, model_registry
 from app.services.collector import Collector
 from app.services.extractor import Extractor
 from app.services.history import ScoreHistory
@@ -28,6 +28,7 @@ async def lifespan(app: FastAPI):
     app.state.score_history = ScoreHistory(settings.score_history_path)
     app.state.pipeline = Pipeline(Collector(), Extractor(), cache)
     model_registry.load()  # silent if no trained model exists (UI-only Terac build)
+    citation_model_registry.load()
     yield
 
 
@@ -61,12 +62,14 @@ def health():
         "status": "healthy",
         "capabilities": {
             "anthropic": settings.has_anthropic,
-            "browserbase": settings.has_browserbase,
+            "firecrawl": settings.has_firecrawl,
+            "research_discovery": settings.has_firecrawl,
             "redis": settings.has_redis,
             "sentry": settings.has_sentry,
             "phoenix": settings.has_phoenix,
             "terac": settings.has_terac,
             "model_loaded": model_registry.is_loaded(),
+            "citation_classifier_loaded": citation_model_registry.is_loaded(),
         },
         "cache_backend": getattr(getattr(app.state, "cache", None), "backend", "memory"),
     }

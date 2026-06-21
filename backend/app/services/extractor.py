@@ -16,7 +16,7 @@ from datetime import date, datetime
 from app.core.config import settings
 from app.services.collector import CollectResult
 
-logger = logging.getLogger("agentshield.extractor")
+logger = logging.getLogger("captain_america.extractor")
 
 _CLICKBAIT_WORDS = (
     "shocking", "secret", "guaranteed", "you won't believe", "miracle", "exposed",
@@ -58,7 +58,7 @@ class Extractor:
         title = collected.title or ""
 
         system = (
-            "You are AgentShield's source-analysis engine for FINANCE sources only. "
+            "You are Captain America's source-analysis engine for FINANCE sources only. "
             "Extract factual/financial claims and assess whether each is supported by "
             "evidence ON THE PAGE (citations, data, named sources). Also detect authorship, "
             "citation presence, publish date, and clickbait. Be skeptical and precise."

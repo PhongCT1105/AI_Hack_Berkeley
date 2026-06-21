@@ -1,4 +1,4 @@
-"""Prompt-driven web research orchestrated by Claude tool use and Browserbase."""
+"""Prompt-driven web research orchestrated by Claude tool use and Firecrawl."""
 from __future__ import annotations
 
 import asyncio
@@ -16,7 +16,8 @@ class ResearchAgent:
     async def run(self, request: ResearchRequest) -> ResearchResponse:
         query, planner = await self._plan(request.prompt)
         cap = min(request.max_sources, settings.research_max_sources)
-        urls, search_mode = await self.pipeline.collector.search(query, cap)
+        discovery = await self.pipeline.collector.search(query, cap)
+        urls, search_mode = discovery.urls, discovery.mode
         semaphore = asyncio.Semaphore(settings.research_concurrency)
 
         async def score(url: str) -> ScoreResponse | None:
@@ -34,6 +35,7 @@ class ResearchAgent:
         return ResearchResponse(
             prompt=request.prompt, search_query=query, discovered_count=len(urls), inspected_count=len(scored),
             agent_mode=f"{planner} + {writer}", search_mode=search_mode, answer=answer,
+            discovery_error=discovery.error,
             cited_sources=cited, rejected_sources=rejected,
         )
 
@@ -44,7 +46,13 @@ class ResearchAgent:
         client = AsyncAnthropic(api_key=settings.anthropic_api_key)
         message = await client.messages.create(
             model=settings.anthropic_model, max_tokens=300,
-            system="You are a web research planner. Use the web_search tool once with a concise current-web search query.",
+            system=(
+                "You are a web research planner. Use the web_search tool once with a concise "
+                "current-web search query. Preserve the user's requested source mix. When they "
+                "ask to compare credible and questionable material, include terms that can find "
+                "both authoritative reporting and promotional, anonymous, or guaranteed-return "
+                "investment claims. Do not assume every result is trustworthy."
+            ),
             tools=[{"name": "web_search", "description": "Search the public web for sources.", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}],
             messages=[{"role": "user", "content": prompt}],
         )

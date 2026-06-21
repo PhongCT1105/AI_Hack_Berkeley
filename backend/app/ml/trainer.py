@@ -22,7 +22,7 @@ import logging
 from app.core.config import settings
 from app.ml import model_registry, terac_store
 
-logger = logging.getLogger("agentshield.trainer")
+logger = logging.getLogger("captain_america.trainer")
 
 MIN_LABELS = 20
 

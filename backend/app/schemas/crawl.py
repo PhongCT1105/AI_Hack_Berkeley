@@ -1,4 +1,4 @@
-"""Schemas for Browserbase crawl requests and Terac training data outputs."""
+"""Schemas for crawl requests and Terac training-data outputs."""
 from __future__ import annotations
 
 from datetime import datetime

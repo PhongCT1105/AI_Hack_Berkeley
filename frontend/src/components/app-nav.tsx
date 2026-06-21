@@ -2,21 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gauge, Menu, Radar, Scale, Shield, Sparkles } from "lucide-react";
-import { useResults } from "@/lib/api";
+import { Activity, Menu, Radar, Shield, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/demo", label: "Run", exact: false, icon: Sparkles },
-  { href: "/arena", label: "Compare", exact: false, icon: Scale },
-  { href: "/", label: "Monitor", exact: true, icon: Gauge },
+  { href: "/demo", label: "Run Shield", shortLabel: "Run", exact: false, icon: ShieldCheck },
+  { href: "/eval", label: "View model evaluation", shortLabel: "Evaluate", exact: false, icon: Activity },
+  { href: "/threats", label: "Review threat feed", shortLabel: "Threats", exact: false, icon: Radar },
 ];
 
 export function AppNav() {
   const pathname = usePathname();
-  const hasThreats = useResults().some((result) => result.recommendation === "AVOID");
-  const navLinks = [...links, { href: "/threats", label: "Threats", exact: false, icon: Radar, indicator: hasThreats }];
-  const mobileLinks = links;
+  const navLinks = links;
 
   return (
     <>
@@ -26,7 +23,7 @@ export function AppNav() {
           {/* Brand */}
           <Link href="/" className="flex items-center gap-2.5 active:scale-95 duration-150">
             <Shield className="size-5 text-primary" />
-            <span className="text-lg font-bold tracking-tighter text-foreground">Shield Terminal</span>
+            <span className="text-lg font-bold tracking-tighter text-foreground">Captain America</span>
           </Link>
 
           {/* Nav links */}
@@ -38,17 +35,15 @@ export function AppNav() {
                   key={l.href}
                   href={l.href}
                   className={cn(
-                    "rounded px-3 py-1.5 text-xs font-semibold tracking-wide uppercase transition-colors duration-150",
+                    "rounded px-2 py-1.5 text-sm font-medium transition-colors duration-150",
                     active
-                      ? "bg-secondary text-primary"
+                      ? "text-primary"
                       : "text-muted-foreground hover:text-primary",
                   )}
                 >
                   <span className="inline-flex items-center gap-1.5">
+                    <l.icon className="size-3.5" />
                     {l.label}
-                    {"indicator" in l && l.indicator && (
-                      <span className="size-1.5 rounded-full bg-destructive pulse-dot" />
-                    )}
                   </span>
                 </Link>
               );
@@ -69,7 +64,7 @@ export function AppNav() {
 
       {/* BottomNavBar (mobile only) */}
       <nav className="fixed bottom-0 left-0 z-50 flex h-16 w-full items-center justify-around border-t border-border/70 bg-background/90 px-4 backdrop-blur-md shadow-lg md:hidden">
-        {mobileLinks.map((l) => {
+        {links.map((l) => {
           const active = l.exact ? pathname === l.href : pathname.startsWith(l.href);
           const Icon = l.icon;
           return (
@@ -82,7 +77,7 @@ export function AppNav() {
               )}
             >
               <Icon className="size-5" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide">{l.label}</span>
+              <span className="text-[10px] font-semibold tracking-wide">{l.shortLabel}</span>
             </Link>
           );
         })}

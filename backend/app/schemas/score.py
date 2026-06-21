@@ -47,7 +47,7 @@ class SourceFeatures(BaseModel):
     recency_days: int | None = None
     word_count: int = 0
     outbound_link_count: int = 0
-    collector_mode: str = "httpx_fallback"    # "browserbase" | "httpx_fallback"
+    collector_mode: str = "httpx_fallback"    # "firecrawl" | "httpx_fallback"
     extractor_mode: str = "heuristic_fallback"  # "claude" | "heuristic_fallback"
 
 
@@ -65,6 +65,17 @@ class EvidenceCapsule(BaseModel):
     method: str = "extractive_fallback"       # "claude" | "extractive_fallback"
 
 
+class CitationAssessment(BaseModel):
+    """Claim/source citation-usability result from the optional trained model."""
+
+    available: bool = False
+    usable_probability: float | None = Field(default=None, ge=0, le=1)
+    threshold: float | None = Field(default=None, ge=0, le=1)
+    eligible: bool | None = None
+    model_version: str | None = None
+    error: str | None = None
+
+
 class ScoreResponse(BaseModel):
     url: str
     task: str
@@ -74,6 +85,7 @@ class ScoreResponse(BaseModel):
     risk_tags: list[str] = Field(default_factory=list)
     verdicts: list[Verdict] = Field(default_factory=list)
     claims: list[Claim] = Field(default_factory=list)
+    citation_assessment: CitationAssessment = Field(default_factory=CitationAssessment)
     evidence_capsule: EvidenceCapsule
     source_features: SourceFeatures
     contributions: list[FeatureContribution] = Field(default_factory=list)

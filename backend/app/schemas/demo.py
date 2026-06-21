@@ -2,7 +2,7 @@
 
 UI-ONLY THIS BUILD: /api/demo-results and /api/demo-run return deterministic,
 synthetic data classified from `app/data/finance_domains.py` rather than running
-the real collector/extractor/Browserbase pipeline — fast + reliable for live
+the real collector/extractor/Firecrawl pipeline — fast + reliable for live
 demos. `app/services/pipeline.py` (Pipeline.score_source) already implements the
 real thing; swap these endpoints to call it once latency/network are acceptable
 for a judge-facing demo. See # TODO(real-pipeline) markers in app/api/demo.py.

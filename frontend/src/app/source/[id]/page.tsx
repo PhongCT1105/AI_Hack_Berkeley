@@ -41,6 +41,7 @@ export default function SourceDetail() {
 
   const f = r.source_features;
   const capsule = r.evidence_capsule;
+  const citation = r.citation_assessment;
   const reduction =
     capsule.token_estimate_before > 0
       ? Math.max(0, Math.round((1 - capsule.token_estimate_after / capsule.token_estimate_before) * 100))
@@ -168,6 +169,31 @@ export default function SourceDetail() {
                   {r.risk_tags.map((t) => (
                     <Badge key={t} tone="danger">{t}</Badge>
                   ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <FileText className="size-4 text-primary" />
+                Citation eligibility
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm">
+              {!citation?.available ? (
+                <p className="text-muted-foreground">No trained citation classifier is available for this result.</p>
+              ) : (
+                <div className="space-y-1.5">
+                  <p className={citation.eligible ? "font-medium text-emerald-700" : "font-medium text-amber-700"}>
+                    {citation.eligible ? "Eligible for citation" : "Held for review"}
+                  </p>
+                  <p className="text-muted-foreground">
+                    Usability confidence {Math.round((citation.usable_probability ?? 0) * 100)}%.
+                    Required threshold {Math.round((citation.threshold ?? 0) * 100)}%.
+                  </p>
+                  {citation.model_version && <p className="font-mono text-xs text-muted-foreground">Model {citation.model_version}</p>}
                 </div>
               )}
             </CardContent>

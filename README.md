@@ -1,24 +1,27 @@
-# AgentShield
+# Captain America
 
 **Credibility infrastructure for AI agents — finance domain.** A calling agent sends a single
-`{url, task}` and AgentShield returns a **trust score (0–100)**, a **USE / CAUTION / AVOID**
+`{url, task}` and Captain America returns a **trust score (0–100)**, a **USE / CAUTION / AVOID**
 recommendation, **risk tags**, per-dimension **verdicts**, extracted **claims + evidence**, and a
 compressed **Credibility Capsule** (reduces 800–1500 tokens of source context to a compact packet).
 Exposed as a FastAPI endpoint *and* a FastMCP tool, so any MCP-capable agent can call it.
 
-> **Design principle:** graceful degradation. The app boots and returns a valid heuristic verdict
-> with **zero API keys**. Each integration (Anthropic, Browserbase, Redis, Sentry, Phoenix, Terac)
-> sits behind a `has_*` flag and falls back to an in-process path — the demo never hard-crashes.
+> **Operational boundary:** a supplied URL can be scored without API keys through the direct HTTP
+> fallback. Live prompt-driven research is different: Firecrawl Search is required for discovery.
+> When it is not configured, `/api/research` returns an explicit discovery error and never falls
+> back to Bing, Browserbase, or another search provider.
 
 ## What's built
 
 - **Engine** (`backend/app/`): pipeline `collector → extractor → features → ranker → capsule`.
-  - Collector: Browserbase/Stagehand → automatic **httpx fallback**.
+  - Research discovery: Firecrawl Search only. Collection: Firecrawl Scrape with a direct HTTP
+    fallback for a supplied source URL.
   - Extractor + Capsule: **Claude** (Anthropic SDK) → heuristic/extractive fallback.
   - Ranker: transparent **heuristic** baseline (per-feature contributions + verdicts).
-- **MCP server** (`backend/mcp_server.py`): FastMCP stdio tool `agentshield_score_source`.
+- **MCP server** (`backend/mcp_server.py`): FastMCP stdio tool `captain_america_score_source`.
 - **Frontend** (`frontend/src/app/`): dark observability-console UI —
-  **Dashboard** (`/`), **Source Detail** (`/source/[id]`), **Terac Arena** (`/arena`).
+  **Dashboard** (`/`), **Research** (`/demo`), **Evaluation** (`/eval`), and **Threat Feed**
+  (`/threats`).
 - **Terac Arena is UI-only this build.** Pairs/labels persist to a local JSON store; the real
   Terac API/MCP + model training is a teammate's follow-up — see the `# TODO(terac):` notes in
   `backend/app/ml/trainer.py` and `terac_store.py`. The heuristic stays the active scorer.
@@ -67,16 +70,44 @@ uvicorn app.main:app --reload --port 8000
 cd frontend && cp .env.local.example .env.local && npm run dev
 
 # MCP tool (optional) — engine must be running
-cd backend && python mcp_server.py          # or: claude mcp add agentshield -- python $(pwd)/mcp_server.py
+cd backend && python mcp_server.py          # or: claude mcp add captain-america -- python $(pwd)/mcp_server.py
 ```
 
-`curl localhost:8000/api/health` reports which integrations are live. Copy `backend/.env.example`
-→ `backend/.env` to add keys (all optional). Phoenix skills:
+`curl localhost:8000/api/health` reports which integrations are live, including
+`research_discovery`. Copy `backend/.env.example` → `backend/.env` to add keys. Firecrawl is
+required only for prompt-driven research discovery. Phoenix skills:
 `npx skills add Arize-ai/phoenix --skill phoenix-tracing --skill phoenix-evals --skill phoenix-cli`.
+
+## API surfaces
+
+| Endpoint | Runtime path | Requirement | Notes |
+|---|---|---|---|
+| `POST /api/score-source` | Collect → extract → rank → capsule | A URL and task | Firecrawl is preferred; direct HTTP is the fallback. |
+| `POST /api/research` | Firecrawl Search → score each source → evidence guard → synthesis | `FIRECRAWL_API_KEY` | Discovery is Firecrawl-only. `discovery_error` explains unavailable, failed, or empty discovery. |
+| `POST /api/crawl` | Crawl supplied URLs → training payload | One or more URLs | Used for structured crawl output, not research discovery. |
+| `GET /api/results`, `GET /api/threats` | Local score history | None | History is local JSON unless a deployment persistence layer is added. |
+| `/api/demo-run`, `/api/eval`, `/api/terac/*` | Demo/evaluation surface | Varies | See the development plan before presenting these as production metrics. |
+
+Run a live research request after setting `FIRECRAWL_API_KEY`:
+
+```bash
+curl -X POST http://localhost:8000/api/research \
+  -H 'Content-Type: application/json' \
+  -H 'X-Captain-America-Caller: local-smoke-test' \
+  -d '{"prompt":"For a source-trust showcase, compare Nvidia’s latest earnings and investment outlook using its investor-relations materials, SEC filings, or Reuters reporting. Contrast them with promotional, anonymous, or guaranteed-return stock-pick claims. Cite only validated evidence and clearly reject weak sources.","max_sources":20}'
+```
+
+Expected behavior: `search_mode` is `firecrawl_search`, `discovered_count` is greater than zero,
+and every cited source has a `USE` recommendation plus an eligible `citation_assessment`. If
+discovery cannot run, the response contains
+an empty source list plus `discovery_error`; it does not silently substitute a different provider.
+
+See [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) for shipped capability, synthetic demo paths, and
+the next implementation gates.
 
 ## Claude MCP demo
 
-AgentShield is registered as a local stdio MCP server named `agentshield`.
+Captain America is registered as a local stdio MCP server named `captain-america`.
 
 ```bash
 # 1. Start the scoring engine.
@@ -84,7 +115,7 @@ cd backend
 DEBUG=true .venv/bin/python -m uvicorn app.main:app --port 8000
 
 # 2. Register the MCP server with Claude Code.
-claude mcp add agentshield -- \
+claude mcp add captain-america -- \
   /absolute/path/to/backend/.venv/bin/python \
   /absolute/path/to/backend/mcp_server.py
 
@@ -92,14 +123,14 @@ claude mcp add agentshield -- \
 claude mcp list
 
 # 4. Run a deterministic test prompt.
-claude -p "Use AgentShield MCP to score https://best-stock-picks-now.com/double-your-money for this task: Research low-risk retirement investments. Return recommendation, score, and risk tags." \
-  --allowedTools mcp__agentshield__agentshield_score_source
+claude -p "Use Captain America MCP to score https://best-stock-picks-now.com/double-your-money for this task: Research low-risk retirement investments. Return recommendation, score, and risk tags." \
+  --allowedTools mcp__captain_america__captain_america_score_source
 ```
 
 The backend terminal logs Claude-originated calls like:
 
 ```text
-[AgentShield] score_source caller=claude-mcp url=https://best-stock-picks-now.com/double-your-money task=Research low-risk retirement investments
+[Captain America] score_source caller=claude-mcp url=https://best-stock-picks-now.com/double-your-money task=Research low-risk retirement investments
 ```
 
 The backend also records those calls in `GET /api/results` and grouped flagged domains in

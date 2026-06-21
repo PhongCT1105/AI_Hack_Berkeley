@@ -3,7 +3,7 @@ import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AppNav } from "@/components/app-nav";
 
-// Hanken Grotesk: the display/body face for the Shield Terminal design system
+// Hanken Grotesk: the display/body face for the Captain America design system
 const hankenGrotesk = Hanken_Grotesk({
   variable: "--font-hanken",
   subsets: ["latin"],

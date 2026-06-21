@@ -20,7 +20,7 @@ from app.schemas.score import EvidenceCapsule, SourceFeatures
 from app.services.collector import CollectResult
 from app.services.extractor import ExtractResult
 
-logger = logging.getLogger("agentshield.capsule")
+logger = logging.getLogger("captain_america.capsule")
 
 
 def _est_tokens(text: str) -> int:

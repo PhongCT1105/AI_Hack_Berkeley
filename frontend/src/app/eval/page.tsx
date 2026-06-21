@@ -1,7 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, FileStack, Gauge, Sparkles, TrendingUp } from "lucide-react";
+import { BarChart3, FileStack, Gauge, PieChart as PieChartIcon, Sparkles, TrendingUp } from "lucide-react";
+import {
+  Bar as RechartsBar,
+  BarChart,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getEvalMetrics } from "@/lib/api";
@@ -10,14 +22,29 @@ import type { EvalMetrics } from "@/lib/types";
 const RESULT_TONE: Record<string, "success" | "warning" | "danger"> = {
   both_right: "success",
   base_wrong_trained_right: "warning",
+  base_right_trained_wrong: "danger",
   both_wrong: "danger",
 };
 
 const RESULT_LABEL: Record<string, string> = {
   both_right: "Both correct",
   base_wrong_trained_right: "Trained fixed it",
+  base_right_trained_wrong: "Trained regressed",
   both_wrong: "Both wrong",
 };
+
+const RESULT_COLOR: Record<string, string> = {
+  both_right: "#10b981",
+  base_wrong_trained_right: "#4648d4",
+  base_right_trained_wrong: "#f59e0b",
+  both_wrong: "#ef4444",
+};
+
+// Recharts initializes ResponsiveContainer at -1 × -1 until ResizeObserver
+// measures its parent. Supplying a valid initial size prevents its development
+// warning while the container settles to its actual responsive dimensions.
+const BAR_CHART_INITIAL_DIMENSION = { width: 1, height: 224 };
+const PIE_CHART_INITIAL_DIMENSION = { width: 1, height: 160 };
 
 export default function EvalPage() {
   const [metrics, setMetrics] = useState<EvalMetrics | null>(null);
@@ -30,7 +57,20 @@ export default function EvalPage() {
     return <div className="mx-auto max-w-7xl px-6 py-20 text-center text-sm text-muted-foreground">Loading evaluation metrics…</div>;
   }
 
-  const maxAccuracy = Math.max(metrics.base_accuracy, metrics.trained_accuracy, 1);
+  const accuracyChartData = [
+    { name: "Base (Fin-Fact pretrain)", accuracy: metrics.base_accuracy, fill: "#9ca3af" },
+    { name: "Terac-trained", accuracy: metrics.trained_accuracy, fill: "#4648d4" },
+  ];
+
+  const resultCounts = metrics.examples.reduce<Record<string, number>>((acc, ex) => {
+    acc[ex.result] = (acc[ex.result] ?? 0) + 1;
+    return acc;
+  }, {});
+  const resultChartData = Object.entries(resultCounts).map(([result, count]) => ({
+    name: RESULT_LABEL[result] ?? result,
+    value: count,
+    fill: RESULT_COLOR[result] ?? "#9ca3af",
+  }));
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
@@ -40,16 +80,20 @@ export default function EvalPage() {
           <Gauge className="size-6 text-primary" />
           Model Improvement
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Base heuristic ranker vs Terac-trained ranker.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Fin-Fact pretrain (no human input) vs Terac-trained model.</p>
       </div>
 
       {/* Summary cards */}
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
-        <MetricCard label="Base heuristic accuracy" value={`${metrics.base_accuracy}%`} accent="gray" />
-        <MetricCard label="Terac-trained accuracy" value={`${metrics.trained_accuracy}%`} accent="primary" />
+        <MetricCard label="Base: Fin-Fact pretrain" value={`${metrics.base_accuracy}%`} accent="gray" />
+        <MetricCard label="Terac-trained (5-fold CV mean)" value={`${metrics.trained_accuracy}%`} accent="primary" />
         <MetricCard label="Improvement" value={`+${metrics.improvement_pct}pp`} accent="emerald" icon={<TrendingUp className="size-4 text-emerald-500" />} />
         <MetricCard label="Held-out examples" value={metrics.held_out_examples} accent="gray" icon={<FileStack className="size-4 text-muted-foreground" />} />
       </div>
+      <p className="mb-6 -mt-2 text-xs text-muted-foreground">
+        Terac-trained accuracy is a 5-fold cross-validation mean across all {metrics.held_out_examples * 5} labeled
+        rows (std ≈ 5.6pp) — more stable than reading off a single small holdout split.
+      </p>
 
       <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
         {/* Bar chart comparison */}
@@ -60,43 +104,86 @@ export default function EvalPage() {
               Base vs Trained Accuracy
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-5">
-            <Bar label="Base heuristic ranker" value={metrics.base_accuracy} max={maxAccuracy} color="#9ca3af" />
-            <Bar label="Terac-trained ranker" value={metrics.trained_accuracy} max={maxAccuracy} color="#4648d4" />
-            <p className="rounded border border-primary/15 bg-secondary/40 px-3.5 py-3 text-xs text-primary">
-              <strong>Base</strong> = hand-written heuristic ranker. <strong>Trained</strong> = model calibrated on Terac
-              human labels. Terac labels are the ground truth this comparison is measured against.
+          <CardContent>
+            <div className="h-56">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                initialDimension={BAR_CHART_INITIAL_DIMENSION}
+              >
+                <BarChart data={accuracyChartData} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="currentColor" className="text-muted-foreground" />
+                  <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 12 }} stroke="currentColor" className="text-muted-foreground" />
+                  <Tooltip
+                    formatter={(value) => [`${value}%`, "Accuracy"]}
+                    contentStyle={{ borderRadius: 8, fontSize: 12 }}
+                  />
+                  <RechartsBar dataKey="accuracy" radius={[6, 6, 0, 0]} maxBarSize={90}>
+                    {accuracyChartData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.fill} />
+                    ))}
+                  </RechartsBar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="mt-3 rounded border border-primary/15 bg-secondary/40 px-3.5 py-3 text-xs text-primary">
+              <strong>Base</strong> = trained only on Fin-Fact&apos;s public true/false verdicts, zero human input.
+              <strong> Terac-trained</strong> = trained directly on the human-annotated Terac labels. Both
+              evaluated on the same held-out test split.
             </p>
           </CardContent>
         </Card>
 
-        {/* Detailed metrics */}
+        {/* Detailed metrics + results breakdown */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-foreground">Detailed Metrics</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <PieChartIcon className="size-4 text-primary" />
+              Held-out Result Breakdown
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Stat label="Human preference match" value={`${metrics.human_preference_match}%`} />
-            <Stat label="Bad-source filtering precision" value={`${metrics.bad_source_filtering_precision}%`} />
-            <Stat label="Cite / do-not-cite accuracy" value={`${metrics.cite_do_not_cite_accuracy}%`} />
-            <Stat label="Average token reduction" value={`${metrics.avg_token_reduction_pct}%`} />
+          <CardContent>
+            <div className="h-40">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                initialDimension={PIE_CHART_INITIAL_DIMENSION}
+              >
+                <PieChart>
+                  <Pie data={resultChartData} dataKey="value" nameKey="name" innerRadius={36} outerRadius={60} paddingAngle={2}>
+                    {resultChartData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name) => [`${value} examples`, name]} contentStyle={{ borderRadius: 8, fontSize: 12 }} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-3 space-y-3">
+              <Stat label="Annotator agreement rate" value={`${metrics.human_preference_match}%`} />
+              <Stat label="Bad-source filtering precision" value={`${metrics.bad_source_filtering_precision}%`} />
+              <Stat label="Citation F1 score" value={`${metrics.cite_do_not_cite_accuracy}%`} />
+              <Stat label="Average token reduction" value={`${metrics.avg_token_reduction_pct}%`} />
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Model comparison cards — Shield Terminal treatment */}
+      {/* Model comparison cards use the Captain America treatment. */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Card className="border-t-4 border-t-muted-foreground/30 bg-muted/30">
           <CardContent className="pt-5">
             <div className="mb-3 flex items-center gap-2">
               <Gauge className="size-5 text-muted-foreground" />
-              <h4 className="text-base font-bold text-foreground">Base Heuristic Ranker</h4>
+              <h4 className="text-base font-bold text-foreground">Base: Fin-Fact Pretrain</h4>
             </div>
             <div className="w-fit rounded bg-card px-3 py-1">
-              <span className="text-xs font-bold tracking-wide text-muted-foreground">BRITTLE</span>
+              <span className="text-xs font-bold tracking-wide text-muted-foreground">NO HUMAN INPUT</span>
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Hand-written rules that fail on nuanced language, sarcasm, or novel domains.
+              Trained only on public Snopes-style true/false verdicts — a different question than
+              &quot;would an AI agent cite this,&quot; so it barely beats chance on the real task.
             </p>
           </CardContent>
         </Card>
@@ -110,10 +197,10 @@ export default function EvalPage() {
               <h4 className="text-base font-bold text-primary">Terac-Trained Ranker</h4>
             </div>
             <div className="w-fit rounded border border-primary/20 bg-secondary px-3 py-1">
-              <span className="text-xs font-bold tracking-wide text-primary">CALIBRATED</span>
+              <span className="text-xs font-bold tracking-wide text-primary">HUMAN-LABELED</span>
             </div>
             <p className="mt-2 text-sm text-foreground">
-              Aligned to human preference labels collected in the Terac Arena.
+              Trained directly on citation-worthiness verdicts collected from human annotators in Terac.
             </p>
           </CardContent>
         </Card>
@@ -224,20 +311,6 @@ function MetricCard({
         <p className={`mt-1 text-2xl font-bold tabular-nums ${valueColor}`}>{value}</p>
       </CardContent>
     </Card>
-  );
-}
-
-function Bar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
-  return (
-    <div>
-      <div className="mb-1.5 flex items-center justify-between">
-        <span className="text-sm font-medium text-foreground">{label}</span>
-        <span className="text-sm font-bold tabular-nums text-foreground">{value}%</span>
-      </div>
-      <div className="h-3 overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full transition-all" style={{ width: `${(value / max) * 100}%`, backgroundColor: color }} />
-      </div>
-    </div>
   );
 }
 
