@@ -1,9 +1,11 @@
-"""Observability: Sentry (errors) + Arize Phoenix (traces/evals).
+"""Observability: Sentry (errors) + Arize AX or Phoenix (traces/evals).
 
-Both are OPTIONAL and import-guarded. With no keys / missing packages we return
-a no-op tracer so pipeline code can call `with tracer.start_as_current_span(...)`
-unconditionally. This is the Phoenix product (phoenix.otel / PHOENIX_API_KEY),
-NOT Arize AX.
+All three are OPTIONAL and import-guarded. With no keys / missing packages we
+return a no-op tracer so pipeline code can call
+`with tracer.start_as_current_span(...)` unconditionally. Arize AX
+(arize-otel / ARIZE_SPACE_ID + ARIZE_API_KEY) is the preferred tracer when
+configured; it falls back to Phoenix (phoenix.otel / PHOENIX_API_KEY), then
+the no-op tracer. Only one tracer provider is ever registered at a time.
 """
 from __future__ import annotations
 
@@ -49,8 +51,27 @@ def init_observability() -> None:
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Sentry init failed, continuing without it: %s", exc)
 
-    # --- Phoenix tracing: only if a collector endpoint is configured ---
-    if settings.has_phoenix:
+    # --- Tracing: Arize AX preferred, Phoenix as fallback. Both register a
+    # global OTel tracer provider, so only attempt one. ---
+    tracer_provider = None
+    if settings.has_arize:
+        try:
+            from arize.otel import register
+
+            tracer_provider = register(
+                space_id=settings.arize_space_id,
+                api_key=settings.arize_api_key,
+                project_name=settings.arize_project_name,
+                # Picks up any installed OpenInference instrumentor (anthropic) by
+                # entry point. Generic OTel instrumentors (httpx, fastapi) are NOT
+                # covered by this flag and are instrumented explicitly below.
+                auto_instrument=True,
+            )
+            _tracer = tracer_provider.get_tracer("captain_america.pipeline")
+            logger.info("Arize AX tracing initialized (project=%s)", settings.arize_project_name)
+        except Exception as exc:  # pragma: no cover - best effort
+            logger.warning("Arize init failed, continuing without it: %s", exc)
+    elif settings.has_phoenix:
         try:
             import os
 
@@ -63,16 +84,42 @@ def init_observability() -> None:
 
             tracer_provider = register(
                 project_name="Captain America",
-                auto_instrument=True,  # picks up anthropic + httpx instrumentation if installed
+                auto_instrument=True,  # picks up anthropic instrumentation if installed
             )
             _tracer = tracer_provider.get_tracer("captain_america.pipeline")
             logger.info("Phoenix tracing initialized")
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Phoenix init failed, continuing without it: %s", exc)
 
+    # --- Generic OTel instrumentation: client-side httpx (propagates W3C
+    # trace context so the mcp_server.py -> FastAPI hop joins one trace) and
+    # server-side FastAPI (extracts that context on the inbound request). Both
+    # are no-ops with an unset tracer provider, but only worth the import cost
+    # when a real provider is registered. ---
+    if tracer_provider is not None:
+        try:
+            from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
+            HTTPXClientInstrumentor().instrument(tracer_provider=tracer_provider)
+        except Exception as exc:  # pragma: no cover - best effort
+            logger.warning("httpx OTel instrumentation failed: %s", exc)
+
+
+def instrument_fastapi_app(app) -> None:
+    """Call once on the FastAPI app instance so inbound request context
+    (e.g. a traceparent header forwarded by mcp_server.py) becomes the parent
+    of the pipeline spans created inside the request, joining them into one
+    trace in Arize. Safe to call even with no tracer configured."""
+    try:
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
+        FastAPIInstrumentor.instrument_app(app)
+    except Exception as exc:  # pragma: no cover - best effort
+        logger.warning("FastAPI OTel instrumentation failed: %s", exc)
+
 
 def get_tracer():
-    """Return a real OTel tracer when Phoenix is live, else a no-op shim."""
+    """Return a real OTel tracer when Arize/Phoenix is live, else a no-op shim."""
     return _tracer if _tracer is not None else _NoOpTracer()
 
 

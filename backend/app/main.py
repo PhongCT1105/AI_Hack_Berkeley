@@ -8,12 +8,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import compress
+from app.api import comparison, compress
 from app.api.crawl import router as crawl_router
-from app.api import demo, history, research, score, terac
+from app.api import demo, history, monitor, research, score, terac, workflow
 from app.core.cache import Cache
 from app.core.config import settings
-from app.core.observability import init_observability
+from app.core.observability import init_observability, instrument_fastapi_app
 from app.ml import citation_model_registry, model_registry
 from app.services.collector import Collector
 from app.services.extractor import Extractor
@@ -24,6 +24,9 @@ from app.services.pipeline import Pipeline
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_observability()
+    # Must run after init_observability() registers the tracer provider —
+    # FastAPIInstrumentor captures the current global provider eagerly.
+    instrument_fastapi_app(app)
     cache = Cache()
     app.state.cache = cache
     app.state.score_history = ScoreHistory(settings.score_history_path)
@@ -50,6 +53,9 @@ app.include_router(terac.router)
 app.include_router(history.router)
 app.include_router(demo.router)
 app.include_router(research.router)
+app.include_router(monitor.router)
+app.include_router(workflow.router)
+app.include_router(comparison.router)
 
 
 @app.get("/")
@@ -69,6 +75,7 @@ def health():
             "redis": settings.has_redis,
             "sentry": settings.has_sentry,
             "phoenix": settings.has_phoenix,
+            "arize": settings.has_arize,
             "terac": settings.has_terac,
             "model_loaded": model_registry.is_loaded(),
             "citation_classifier_loaded": citation_model_registry.is_loaded(),

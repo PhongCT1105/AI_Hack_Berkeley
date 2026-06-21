@@ -31,6 +31,13 @@ class ComparisonPair(BaseModel):
     reasons_a: list[str] = Field(default_factory=list)
     reasons_b: list[str] = Field(default_factory=list)
     labeled: bool = False
+    # Numeric feature vectors (model_registry.FEATURE_ORDER) captured at pair
+    # creation time so trainer.py can build pairwise rows without rescoring.
+    features_a: list[float] | None = None
+    features_b: list[float] | None = None
+    # Set when the monitor auto-queues this pair after a degradation finding,
+    # rather than a human creating it via the Arena screen.
+    auto_queued_reason: str | None = None
 
 
 class CreatePairRequest(BaseModel):
@@ -53,3 +60,7 @@ class ModelStatus(BaseModel):
     coefficients: dict[str, float] | None = None
     active_scorer: str = "heuristic"          # "logistic_model" | "heuristic"
     note: str | None = None                   # e.g. "Terac training not configured yet"
+    # Held-out evidence the candidate model was promoted (or rejected) on.
+    holdout_accuracy: float | None = None
+    baseline_accuracy: float | None = None
+    holdout_size: int | None = None

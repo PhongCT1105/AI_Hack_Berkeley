@@ -2,14 +2,17 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+import json
+from pathlib import Path
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.compress import CompressionRequest, CompressionResponse
 from app.services.prompt_compressor import CompressionConfig, PromptCompressor
-from app.services.semantic_ir_compressor import SemanticIRCompressor
+from app.services.semantic_ir_compressor import FinanceCredibilityCompressor, SemanticIRCompressor
 
 router = APIRouter(prefix="/api", tags=["compression"])
+_EVALUATION_REPORT = Path(__file__).resolve().parents[2] / "data" / "compression_evaluations" / "latest.json"
 
 
 @router.post("/compress", response_model=CompressionResponse)
@@ -36,6 +39,24 @@ def compress(req: CompressionRequest) -> CompressionResponse:
             notes=list(result.notes),
         )
 
+    if req.method == "finance_credibility":
+        result = FinanceCredibilityCompressor().compress(req.text)
+        preserved, missing = _preservation_items(result.compact_language, req.query)
+        return CompressionResponse(
+            method=req.method,
+            original_text=result.original_text,
+            compressed_text=result.compact_language,
+            reconstructed_prompt=result.reconstructed_prompt,
+            original_tokens=result.original_token_estimate,
+            compressed_tokens=result.compact_token_estimate,
+            compression_ratio=result.compression_ratio,
+            token_savings_percent=_savings(result.original_token_estimate, result.compact_token_estimate),
+            preservation_score=_preservation_score(preserved, missing),
+            preserved_items=preserved,
+            missing_items=missing,
+            notes=list(result.notes),
+        )
+
     result = SemanticIRCompressor().compress(req.text)
     preserved, missing = _preservation_items(
         "\n".join([result.compact_language, result.reconstructed_prompt]),
@@ -56,6 +77,22 @@ def compress(req: CompressionRequest) -> CompressionResponse:
         semantic_ir=asdict(result.semantic_ir),
         notes=list(result.notes),
     )
+
+
+@router.get("/compress/evaluations/latest")
+def latest_compression_evaluation() -> dict:
+    """Return the saved raw/compressed prompt pairs for visualization."""
+
+    try:
+        with _EVALUATION_REPORT.open(encoding="utf-8") as handle:
+            return json.load(handle)
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail="No compression evaluation yet. Run scripts/eval_ttc_compression.py first.",
+        ) from exc
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=500, detail="Latest compression evaluation is invalid JSON.") from exc
 
 
 def _token_estimate(text: str) -> int:

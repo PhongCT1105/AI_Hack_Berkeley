@@ -62,7 +62,7 @@ class EvidenceCapsule(BaseModel):
     key_reasons: list[str] = Field(default_factory=list)
     token_estimate_before: int = 0
     token_estimate_after: int = 0
-    method: str = "extractive_fallback"       # "claude" | "extractive_fallback"
+    method: str = "extractive_fallback"       # "finance_credibility" | "extractive_fallback"
 
 
 class CitationAssessment(BaseModel):

@@ -20,10 +20,20 @@ from typing import Annotated, Any
 
 import httpx
 from fastmcp import FastMCP
+from openinference.semconv.trace import OpenInferenceSpanKindValues, SpanAttributes
 from pydantic import Field
+
+from app.core.observability import get_tracer, init_observability
 
 # AGENTSHIELD_* remains a migration fallback for existing local MCP configs.
 API_URL = os.environ.get("CAPTAIN_AMERICA_API_URL") or os.environ.get("AGENTSHIELD_API_URL", "http://localhost:8000")
+
+# This is a separate OS process from the FastAPI engine, so it needs its own
+# tracer-provider registration. With httpx auto-instrumented on both sides
+# (see app/core/observability.py) and FastAPI's inbound instrumentation, the
+# W3C traceparent header httpx attaches below carries this span's context
+# into the engine process — one Arize trace per agent call, not two.
+init_observability()
 
 logging.basicConfig(
     level=os.environ.get("CAPTAIN_AMERICA_MCP_LOG_LEVEL") or os.environ.get("AGENTSHIELD_MCP_LOG_LEVEL", "INFO"),
@@ -68,33 +78,43 @@ async def captain_america_score_source(
     task: Annotated[str, Field(description="What you intend to do with this source")],
 ) -> dict:
     logger.info("tool=captain_america_score_source url=%s task=%s", url, task)
-    try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(
-                f"{API_URL}/api/score-source",
-                headers={"X-Captain-America-Caller": "claude-mcp"},
-                json={"url": url, "task": task},
-            )
-            resp.raise_for_status()
-            payload = resp.json()
-            logger.info(
-                "result trace_id=%s domain=%s score=%s recommendation=%s risk_tags=%s",
-                payload.get("trace_id"),
-                payload.get("domain"),
-                payload.get("trust_score"),
-                payload.get("recommendation"),
-                payload.get("risk_tags"),
-            )
-            return payload
-    except httpx.ConnectError as exc:
-        logger.exception("engine unreachable api_url=%s", API_URL)
-        raise RuntimeError(
-            f"Captain America engine unreachable at {API_URL}. Start it with: "
-            f"cd backend && uvicorn app.main:app --reload"
-        ) from exc
-    except httpx.HTTPStatusError as exc:
-        logger.exception("engine returned error status=%s body=%s", exc.response.status_code, exc.response.text)
-        raise
+    tracer = get_tracer()
+    with tracer.start_as_current_span("captain_america_mcp.score_source") as span:
+        span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)
+        span.set_attribute("mcp.tool", "captain_america_score_source")
+        span.set_attribute("captain_america.url", url)
+        span.set_attribute("captain_america.task", task)
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                resp = await client.post(
+                    f"{API_URL}/api/score-source",
+                    headers={"X-Captain-America-Caller": "claude-mcp"},
+                    json={"url": url, "task": task},
+                )
+                resp.raise_for_status()
+                payload = resp.json()
+                logger.info(
+                    "result trace_id=%s domain=%s score=%s recommendation=%s risk_tags=%s",
+                    payload.get("trace_id"),
+                    payload.get("domain"),
+                    payload.get("trust_score"),
+                    payload.get("recommendation"),
+                    payload.get("risk_tags"),
+                )
+                span.set_attribute("captain_america.trust_score", payload.get("trust_score", -1))
+                span.set_attribute("captain_america.recommendation", payload.get("recommendation", ""))
+                return payload
+        except httpx.ConnectError as exc:
+            logger.exception("engine unreachable api_url=%s", API_URL)
+            span.record_exception(exc)
+            raise RuntimeError(
+                f"Captain America engine unreachable at {API_URL}. Start it with: "
+                f"cd backend && uvicorn app.main:app --reload"
+            ) from exc
+        except httpx.HTTPStatusError as exc:
+            logger.exception("engine returned error status=%s body=%s", exc.response.status_code, exc.response.text)
+            span.record_exception(exc)
+            raise
 
 
 if __name__ == "__main__":

@@ -9,14 +9,14 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 
-from app.ml import model_registry, terac_store, trainer
-from app.schemas.score import ScoreRequest
+from app.ml import model_registry, terac_client, terac_store, trainer
 from app.schemas.terac import (
     ComparisonPair,
     CreatePairRequest,
     LabelSubmission,
     ModelStatus,
 )
+from app.services.pairing import build_pair
 
 router = APIRouter(prefix="/api/terac", tags=["terac"])
 
@@ -25,17 +25,8 @@ router = APIRouter(prefix="/api/terac", tags=["terac"])
 async def create_pair(body: CreatePairRequest, request: Request) -> ComparisonPair:
     """Score two sources for the same task and store them as a comparison pair."""
     pipeline = request.app.state.pipeline
-    a = await pipeline.score_source(ScoreRequest(url=body.url_a, task=body.task))
-    b = await pipeline.score_source(ScoreRequest(url=body.url_b, task=body.task))
-
-    pair = terac_store.add_pair({
-        "task": body.task,
-        "url_a": a.url, "url_b": b.url,
-        "domain_a": a.domain, "domain_b": b.domain,
-        "score_a": a.trust_score, "score_b": b.trust_score,
-        "reasons_a": [v.detail for v in a.verdicts[:4]],
-        "reasons_b": [v.detail for v in b.verdicts[:4]],
-    })
+    pair = await build_pair(pipeline, body.task, body.url_a, body.url_b)
+    terac_client.push_pair(pair)
     return ComparisonPair(**pair)
 
 
@@ -58,7 +49,7 @@ async def submit_label(label: LabelSubmission) -> dict:
 
 @router.post("/train", response_model=ModelStatus)
 async def train() -> ModelStatus:
-    result = trainer.train()  # stub — see trainer.py TODO(terac)
+    result = trainer.train()
     if result.get("trained"):
         model_registry.load()
     return _model_status(note=result.get("note"))
@@ -71,11 +62,15 @@ async def model_status() -> ModelStatus:
 
 def _model_status(note: str | None = None) -> ModelStatus:
     loaded = model_registry.is_loaded()
+    meta = model_registry.meta()
     return ModelStatus(
         loaded=loaded,
-        trained_at=model_registry.meta().get("trained_at"),
+        trained_at=meta.get("trained_at"),
         n_labels_used=terac_store.label_count(),
         coefficients=model_registry.coefficients(),
         active_scorer="logistic_model" if loaded else "heuristic",
-        note=note or (None if loaded else "Terac training not configured yet (UI-only build)."),
+        note=note or (None if loaded else "Not enough Terac labels to train yet."),
+        holdout_accuracy=meta.get("holdout_accuracy"),
+        baseline_accuracy=meta.get("baseline_accuracy"),
+        holdout_size=meta.get("holdout_size"),
     )

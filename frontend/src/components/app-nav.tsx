@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Menu, Radar, Shield, ShieldCheck } from "lucide-react";
+import { Activity, Menu, Radar, Scale, Shield, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/demo", label: "Run Shield", shortLabel: "Run", exact: false, icon: ShieldCheck },
+  { href: "/compare", label: "Compare pipelines", shortLabel: "Compare", exact: false, icon: Scale },
   { href: "/eval", label: "View model evaluation", shortLabel: "Evaluate", exact: false, icon: Activity },
   { href: "/threats", label: "Review threat feed", shortLabel: "Threats", exact: false, icon: Radar },
 ];

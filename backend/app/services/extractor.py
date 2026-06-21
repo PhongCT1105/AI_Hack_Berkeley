@@ -12,9 +12,11 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from typing import Any
 
 from app.core.config import settings
 from app.services.collector import CollectResult
+from app.services.llm_clients import create_anthropic_client, get_compression_stats, record_compression_stats
 
 logger = logging.getLogger("captain_america.extractor")
 
@@ -35,23 +37,28 @@ class ExtractResult:
     publish_date: str | None = None        # ISO date string if found
     clickbait_signal: float = 0.0          # 0..1
     mode: str = "heuristic_fallback"       # "claude" | "heuristic_fallback"
+    compression: dict | None = None        # TTC stats when the_token_company wrapped this call
+    usage: dict | None = None              # real Anthropic input_tokens/output_tokens for this call
 
 
 class Extractor:
-    async def extract(self, collected: CollectResult, task: str) -> ExtractResult:
+    async def extract(self, collected: CollectResult, task: str, client: Any | None = None) -> ExtractResult:
         if settings.has_anthropic and collected.text:
             try:
-                return await self._extract_claude(collected, task)
+                return await self._extract_claude(collected, task, client=client)
             except Exception as exc:
                 logger.warning("Claude extract failed, using heuristic: %s", exc)
         return self._extract_heuristic(collected)
 
     # ------------------------------------------------------------------ #
-    async def _extract_claude(self, collected: CollectResult, task: str) -> ExtractResult:
-        """Structured extraction via the Anthropic SDK (Claude Opus 4.8)."""
-        from anthropic import AsyncAnthropic
+    async def _extract_claude(self, collected: CollectResult, task: str, client: Any | None = None) -> ExtractResult:
+        """Structured extraction via the Anthropic SDK (Claude Opus 4.8).
 
-        client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+        `client` defaults to the TTC-wrapped client; callers that want the
+        uncompressed baseline (the comparison showcase's "weak" side) pass a
+        bare AsyncAnthropic client instead — same prompt, same model, the
+        only variable that changes is whether TTC compressed it first."""
+        client = client or create_anthropic_client()
 
         # Budget the page text so we don't blow context on huge pages.
         page = collected.text[:18000]
@@ -80,8 +87,20 @@ class Extractor:
             system=system,
             messages=[{"role": "user", "content": prompt}],
         )
+        record_compression_stats(client)  # no-op unless TTC_API_KEY is set
+        compression = get_compression_stats(client)
+        if compression is not None:
+            # The page text (the website's own content, not just the prompt
+            # scaffolding) is what TTC actually compressed before this call.
+            compression["page_chars_sent"] = len(page)
         raw = "".join(block.text for block in msg.content if getattr(block, "type", "") == "text")
         data = _loads_json(raw)
+        usage = None
+        if getattr(msg, "usage", None) is not None:
+            usage = {
+                "input_tokens": int(getattr(msg.usage, "input_tokens", 0) or 0),
+                "output_tokens": int(getattr(msg.usage, "output_tokens", 0) or 0),
+            }
 
         return ExtractResult(
             claims=data.get("claims", [])[:6],
@@ -92,6 +111,8 @@ class Extractor:
             publish_date=data.get("publish_date"),
             clickbait_signal=float(data.get("clickbait_signal") or 0.0),
             mode="claude",
+            compression=compression,
+            usage=usage,
         )
 
     # ------------------------------------------------------------------ #
