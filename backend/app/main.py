@@ -1,11 +1,37 @@
-"""FastAPI entrypoint. Minimal scaffold — add routers under app/api/ as the app grows."""
+"""AgentShield FastAPI entrypoint.
+
+Credibility infrastructure for AI agents (finance domain). Boots and serves a
+valid heuristic verdict with zero API keys; every integration degrades gracefully.
+"""
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.crawl import router as crawl_router
+from app.api import history, score, terac
+from app.core.cache import Cache
 from app.core.config import settings
+from app.core.observability import init_observability
+from app.ml import model_registry
+from app.services.collector import Collector
+from app.services.extractor import Extractor
+from app.services.history import ScoreHistory
+from app.services.pipeline import Pipeline
 
-app = FastAPI(title=settings.app_name, debug=settings.debug)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_observability()
+    cache = Cache()
+    app.state.cache = cache
+    app.state.score_history = ScoreHistory(settings.score_history_path)
+    app.state.pipeline = Pipeline(Collector(), Extractor(), cache)
+    model_registry.load()  # silent if no trained model exists (UI-only Terac build)
+    yield
+
+
+app = FastAPI(title=settings.app_name, debug=settings.debug, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,6 +42,9 @@ app.add_middleware(
 )
 
 app.include_router(crawl_router)
+app.include_router(score.router)
+app.include_router(terac.router)
+app.include_router(history.router)
 
 
 @app.get("/")
@@ -25,4 +54,17 @@ def root():
 
 @app.get("/api/health")
 def health():
-    return {"status": "healthy"}
+    """Reports which integrations are live — great for demoing graceful degradation."""
+    return {
+        "status": "healthy",
+        "capabilities": {
+            "anthropic": settings.has_anthropic,
+            "browserbase": settings.has_browserbase,
+            "redis": settings.has_redis,
+            "sentry": settings.has_sentry,
+            "phoenix": settings.has_phoenix,
+            "terac": settings.has_terac,
+            "model_loaded": model_registry.is_loaded(),
+        },
+        "cache_backend": getattr(getattr(app.state, "cache", None), "backend", "memory"),
+    }
