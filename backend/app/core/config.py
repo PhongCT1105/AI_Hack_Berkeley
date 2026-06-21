@@ -35,8 +35,7 @@ class Settings(BaseSettings):
 
     # --- External services (all optional; absence triggers graceful fallback) ---
     anthropic_api_key: str | None = None
-    anthropic_model: str = "claude-opus-4-8"
-
+    anthropic_model: str = "claude-haiku-4-5"
     firecrawl_api_key: str | None = None
     firecrawl_api_url: str = "https://api.firecrawl.dev"
     firecrawl_page_timeout_ms: int = 60000
