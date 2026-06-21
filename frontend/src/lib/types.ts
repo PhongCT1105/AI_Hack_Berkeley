@@ -46,6 +46,15 @@ export interface EvidenceCapsule {
   method: string;
 }
 
+export interface CitationAssessment {
+  available: boolean;
+  usable_probability: number | null;
+  threshold: number | null;
+  eligible: boolean | null;
+  model_version: string | null;
+  error: string | null;
+}
+
 export interface ScoreResponse {
   url: string;
   task: string;
@@ -55,6 +64,7 @@ export interface ScoreResponse {
   risk_tags: string[];
   verdicts: Verdict[];
   claims: Claim[];
+  citation_assessment: CitationAssessment;
   evidence_capsule: EvidenceCapsule;
   source_features: SourceFeatures;
   contributions: FeatureContribution[];
@@ -64,38 +74,6 @@ export interface ScoreResponse {
   trace_id: string;
 }
 
-// Terac arena
-export interface ComparisonPair {
-  pair_id: string;
-  task: string;
-  url_a: string;
-  url_b: string;
-  domain_a: string;
-  domain_b: string;
-  score_a: number;
-  score_b: number;
-  reasons_a: string[];
-  reasons_b: string[];
-  labeled: boolean;
-}
-
-export interface FeedbackForm {
-  author_credible?: boolean | null;
-  citations_sufficient?: boolean | null;
-  recency_adequate?: boolean | null;
-  not_clickbait?: boolean | null;
-  domain_trusted?: boolean | null;
-  free_text?: string | null;
-}
-
-export interface ModelStatus {
-  loaded: boolean;
-  trained_at: string | null;
-  n_labels_used: number;
-  coefficients: Record<string, number> | null;
-  active_scorer: string;
-  note: string | null;
-}
 
 // Demo pipeline
 export type DemoRecommendation = "cite" | "use_with_caution" | "do_not_cite";
@@ -171,6 +149,7 @@ export interface ResearchResponse {
   inspected_count: number;
   agent_mode: string;
   search_mode: string;
+  discovery_error: string | null;
   answer: string;
   cited_sources: ScoreResponse[];
   rejected_sources: ScoreResponse[];

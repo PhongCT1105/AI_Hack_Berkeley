@@ -41,7 +41,7 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Shield Terminal shape language — sharp, comic-bordered, low radius */
+  /* Captain America shape language: sharp, comic-bordered, low radius */
   --radius-sm: 0.125rem;
   --radius-md: 0.125rem;
   --radius-lg: 0.25rem;
@@ -50,7 +50,7 @@
 }
 
 /* ────────────────────────────────────────────────────────────
-   Captain America Design System — "Shield Terminal"
+   Captain America Design System: Shield Terminal
    Primary: #4648D4 (indigo)  Background: #F8F9FF
    ──────────────────────────────────────────────────────────── */
 :root {
@@ -99,7 +99,7 @@
   --sidebar-border:             #c7c4d7;
   --sidebar-ring:               #4648d4;
 
-  /* Shield Terminal extras — surfaces beyond the shadcn token set */
+  /* Captain America extras: surfaces beyond the shadcn token set */
   --surface-dim:              #cbdbf5;
   --surface-container-low:    #eff4ff;
   --surface-container:        #e5eeff;

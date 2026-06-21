@@ -3,16 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Activity,
   ArrowRight,
   CirclePause,
   Download,
-  ExternalLink,
-  Gauge,
-  Play,
-  Radar,
-  ShieldCheck,
-  Users,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useResults } from "@/lib/api";
@@ -152,25 +145,6 @@ export default function MonitorPage() {
         </aside>
       </section>
 
-      <Card className="glass-panel mt-6 overflow-hidden">
-        <CardContent className="pt-6">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-            <div><h2 className="text-lg font-bold tracking-tight">Human label queue</h2><p className="mt-1 text-sm text-muted-foreground">Active reinforcement learning from human feedback.</p></div>
-            <div className="grid grid-cols-2 divide-x divide-border rounded border border-border bg-muted/60 text-center"><div className="px-5 py-2"><p className="text-lg font-bold text-primary">{results.length || 150}</p><p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Terac labels</p></div><div className="px-5 py-2"><p className="text-lg font-bold">82%</p><p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Human agreement</p></div></div>
-          </div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <QueueMetric icon={Users} label="Source pairs" value="50" />
-            <QueueMetric icon={Gauge} label="Model state" value="Calibrated" />
-            <Link href="/arena" className="flex items-center justify-between rounded border border-primary/20 bg-primary/5 p-4 transition-colors hover:bg-primary/10 active:translate-y-px"><span><span className="block text-[10px] font-semibold uppercase tracking-wide text-primary">Pending tasks</span><span className="mt-1 block text-sm font-medium">Start labeling</span></span><Play className="size-4 text-primary" /></Link>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="mt-6 flex flex-wrap gap-3 text-xs text-muted-foreground">
-        <Link href="/demo" className="inline-flex items-center gap-1 text-primary hover:underline"><ShieldCheck className="size-3.5" /> Run Shield <ExternalLink className="size-3" /></Link>
-        <Link href="/eval" className="inline-flex items-center gap-1 hover:text-primary"><Activity className="size-3.5" /> View model evaluation</Link>
-        <Link href="/threats" className="inline-flex items-center gap-1 hover:text-primary"><Radar className="size-3.5" /> Review threat feed</Link>
-      </div>
     </div>
   );
 }
@@ -182,8 +156,4 @@ function Metric({ label, value, detail, tone, bar }: { label: string; value: str
 
 function HealthEvent({ tone, label, time }: { tone: string; label: string; time: string }) {
   return <div className="flex items-center justify-between gap-3"><span className="flex items-center gap-2"><span className={`size-1.5 rounded-full ${tone}`} />{label}</span><span className="shrink-0 text-slate-400">{time}</span></div>;
-}
-
-function QueueMetric({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: string }) {
-  return <div className="rounded border border-border bg-card p-4"><Icon className="size-4 text-primary" /><span className="mt-3 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</span><span className="mt-1 block text-lg font-bold">{value}</span></div>;
 }

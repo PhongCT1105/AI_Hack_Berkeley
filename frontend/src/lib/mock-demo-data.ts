@@ -1,7 +1,7 @@
 // Client-side mock data + classifier for the Captain America demo pipeline.
 // Mirrors backend/app/api/demo.py so the UI behaves identically whether the
 // FastAPI backend is reachable or not — see lib/api.ts for the fetch-then-fallback
-// wiring. TODO(real-pipeline): once Browserbase + the trained ranker are wired,
+// wiring. TODO(real-pipeline): once Firecrawl + the trained ranker are wired,
 // this file becomes dead code and runDemo() always hits the real backend.
 import type {
   ArenaPair,

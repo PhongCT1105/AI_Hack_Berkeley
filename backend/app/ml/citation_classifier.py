@@ -79,3 +79,26 @@ def record_text(record: Mapping[str, Any]) -> str:
             value = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
         parts.append(f"{key}: {value}")
     return "\n".join(parts)
+
+
+def inference_text(
+    *,
+    task: str,
+    title: str,
+    url: str,
+    author: str | None,
+    claims: list[Mapping[str, Any]],
+) -> str:
+    """Build runtime input using the same named fields as training records."""
+    claim_text = "\n".join(str(claim.get("text") or "") for claim in claims[:6]).strip()
+    evidence_text = "\n".join(
+        str(claim.get("evidence_snippet") or "") for claim in claims[:6]
+    ).strip()
+    return record_text({
+        "research_task": task,
+        "title": title,
+        "author": author or "",
+        "url": url,
+        "claim": claim_text,
+        "evidence_text": evidence_text,
+    })

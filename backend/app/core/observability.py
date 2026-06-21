@@ -12,7 +12,7 @@ import logging
 
 from app.core.config import settings
 
-logger = logging.getLogger("agentshield.observability")
+logger = logging.getLogger("captain_america.observability")
 
 _initialized = False
 _tracer = None
@@ -62,10 +62,10 @@ def init_observability() -> None:
             from phoenix.otel import register
 
             tracer_provider = register(
-                project_name="AgentShield",
+                project_name="Captain America",
                 auto_instrument=True,  # picks up anthropic + httpx instrumentation if installed
             )
-            _tracer = tracer_provider.get_tracer("agentshield.pipeline")
+            _tracer = tracer_provider.get_tracer("captain_america.pipeline")
             logger.info("Phoenix tracing initialized")
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Phoenix init failed, continuing without it: %s", exc)

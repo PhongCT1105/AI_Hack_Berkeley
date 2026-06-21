@@ -11,19 +11,25 @@ import time
 import uuid
 
 from app.core.cache import Cache
+from app.core.config import settings
 from app.core.observability import capture_exception, get_tracer
+from app.ml import citation_model_registry
 from app.schemas.score import (
     Claim,
+    CitationAssessment,
     EvidenceCapsule,
+    FeatureContribution,
     Recommendation,
     ScoreRequest,
     ScoreResponse,
     SourceFeatures,
+    Verdict,
 )
 from app.services import features as features_mod
 from app.services import ranker, reputation
 from app.services.capsule import compress
 from app.services.collector import Collector
+from app.ml.citation_classifier import inference_text
 from app.services.extractor import Extractor
 
 
@@ -39,22 +45,24 @@ class Pipeline:
         started = time.perf_counter()
         degradations: list[str] = []
 
-        cache_key = "score:" + hashlib.sha256(f"{req.url}|{req.task}".encode()).hexdigest()
+        cache_key = "score:v2:" + hashlib.sha256(
+            f"{req.url}|{req.task}|{citation_model_registry.cache_fingerprint()}".encode()
+        ).hexdigest()
         cached = await self.cache.get(cache_key)
         if cached:
             cached["trace_id"] = trace_id
             cached["degradations"] = list(cached.get("degradations", [])) + ["served from cache"]
             return ScoreResponse(**cached)
 
-        with tracer.start_as_current_span("agentshield.score_source") as root:
-            root.set_attribute("agentshield.url", req.url)
-            root.set_attribute("agentshield.task", req.task)
+        with tracer.start_as_current_span("captain_america.score_source") as root:
+            root.set_attribute("captain_america.url", req.url)
+            root.set_attribute("captain_america.task", req.task)
 
             # Stage 1: collect
             with tracer.start_as_current_span("stage.collector") as span:
                 collected = await self.collector.collect(req.url)
                 span.set_attribute("collector.mode", collected.mode)
-                if collected.mode != "browserbase":
+                if collected.mode != "firecrawl":
                     degradations.append(f"collector: {collected.mode}")
                 if collected.error:
                     degradations.append(f"collector error: {collected.error}")
@@ -79,6 +87,66 @@ class Pipeline:
                 span.set_attribute("ranker.scorer_mode", scorer_mode)
                 if scorer_mode == "heuristic":
                     degradations.append("ranker: heuristic (no Terac-trained model)")
+
+            # Stage 4b: citation gate. This can only downgrade a source that
+            # otherwise qualified for citation; it never upgrades weak sources.
+            with tracer.start_as_current_span("stage.citation_classifier") as span:
+                document = inference_text(
+                    task=req.task,
+                    title=collected.title,
+                    url=collected.final_url,
+                    author=extracted.author_name,
+                    claims=extracted.claims,
+                )
+                prediction = citation_model_registry.assess(
+                    document, settings.citation_model_min_probability
+                )
+                citation_assessment = CitationAssessment(**prediction.__dict__)
+                span.set_attribute("citation_classifier.available", citation_assessment.available)
+                if citation_assessment.usable_probability is not None:
+                    span.set_attribute(
+                        "citation_classifier.usable_probability",
+                        citation_assessment.usable_probability,
+                    )
+                if citation_assessment.error:
+                    degradations.append(f"citation classifier: {citation_assessment.error}")
+                elif not citation_assessment.available:
+                    degradations.append("citation classifier: unavailable")
+                elif citation_assessment.eligible is False:
+                    contributions.append(FeatureContribution(
+                        feature="citation_classifier",
+                        value=citation_assessment.usable_probability,
+                        points=0,
+                    ))
+                    verdicts.append(Verdict(
+                        dimension="citation-usability",
+                        passed=False,
+                        detail=(
+                            "Citation classifier confidence "
+                            f"{citation_assessment.usable_probability:.2f} is below the "
+                            f"required {citation_assessment.threshold:.2f}"
+                        ),
+                        weight=20,
+                    ))
+                    risk_tags.append("citation classifier rejected")
+                    if recommendation == Recommendation.USE:
+                        recommendation = Recommendation.CAUTION
+                else:
+                    contributions.append(FeatureContribution(
+                        feature="citation_classifier",
+                        value=citation_assessment.usable_probability,
+                        points=0,
+                    ))
+                    verdicts.append(Verdict(
+                        dimension="citation-usability",
+                        passed=True,
+                        detail=(
+                            "Citation classifier confidence "
+                            f"{citation_assessment.usable_probability:.2f} meets the "
+                            f"required {citation_assessment.threshold:.2f}"
+                        ),
+                        weight=20,
+                    ))
 
             top_reasons = [c.detail for c in sorted(verdicts, key=lambda v: -v.weight)[:5]]
 
@@ -118,6 +186,7 @@ class Pipeline:
                 risk_tags=sorted(set(risk_tags)),
                 verdicts=verdicts,
                 claims=claims,
+                citation_assessment=citation_assessment,
                 evidence_capsule=capsule,
                 source_features=feats,
                 contributions=contributions,
@@ -126,7 +195,7 @@ class Pipeline:
                 latency_ms=latency_ms,
                 trace_id=trace_id,
             )
-            root.set_attribute("agentshield.recommendation", recommendation.value)
+            root.set_attribute("captain_america.recommendation", recommendation.value)
 
         await self.cache.set(cache_key, response.model_dump(mode="json"))
         await reputation.record_observation(domain, trust_score, self.cache)

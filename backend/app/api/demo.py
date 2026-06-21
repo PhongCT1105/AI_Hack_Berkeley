@@ -1,7 +1,7 @@
 """Captain America demo endpoints — deterministic, mocked-first.
 
 UI-ONLY THIS BUILD: classification below is synthetic (domain prior + keyword
-heuristics), not a real collector/extractor/Browserbase run. The real pipeline
+heuristics), not a real collector/extractor/Firecrawl run. The real pipeline
 already exists at app/services/pipeline.py (Pipeline.score_source) and powers
 /api/score-source — swap `_classify_url` for a call into that pipeline once
 per-source latency is acceptable for a judge-facing demo.
@@ -225,10 +225,21 @@ _MOCK_EVAL = EvalMetrics(
     examples=_EVAL_EXAMPLES,
 )
 
+_EVAL_RESULTS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "data", "eval_results.json")
+
+
+def _load_real_eval() -> EvalMetrics | None:
+    """Real metrics from scripts/compute_eval_metrics.py, if computed."""
+    try:
+        with open(_EVAL_RESULTS_PATH) as fh:
+            return EvalMetrics(**json.load(fh))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
 
 @router.get("/eval", response_model=EvalMetrics)
 def eval_metrics() -> EvalMetrics:
-    return _MOCK_EVAL
+    return _load_real_eval() or _MOCK_EVAL
 
 
 # ---------------------------------------------------------------------------

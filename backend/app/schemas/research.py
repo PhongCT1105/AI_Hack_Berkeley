@@ -17,6 +17,7 @@ class ResearchResponse(BaseModel):
     inspected_count: int
     agent_mode: str
     search_mode: str
+    discovery_error: str | None = None
     answer: str
     cited_sources: list[ScoreResponse] = Field(default_factory=list)
     rejected_sources: list[ScoreResponse] = Field(default_factory=list)

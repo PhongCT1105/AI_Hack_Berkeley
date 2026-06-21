@@ -1,4 +1,4 @@
-"""POST /api/score-source — the core credibility endpoint a calling agent hits."""
+"""POST /api/score-source, the core credibility endpoint a calling agent hits."""
 from __future__ import annotations
 
 import logging
@@ -10,16 +10,22 @@ from app.core.observability import capture_exception
 from app.schemas.score import ScoreRequest, ScoreResponse
 
 router = APIRouter(prefix="/api", tags=["score"])
-logger = logging.getLogger("agentshield.api.score")
+logger = logging.getLogger("captain_america.api.score")
 
 
 @router.post("/score-source", response_model=ScoreResponse)
 async def score_source(req: ScoreRequest, request: Request) -> ScoreResponse:
     pipeline = request.app.state.pipeline
-    caller = request.headers.get("x-agentshield-caller", "api")
+    # Keep the old header during the brand migration so existing integrations
+    # retain their source history. New callers should use X-Captain-America-Caller.
+    caller = (
+        request.headers.get("x-captain-america-caller")
+        or request.headers.get("x-agentshield-caller")
+        or "api"
+    )
     logger.info("score_source caller=%s url=%s task=%s", caller, req.url, req.task)
     print(
-        f"[AgentShield] score_source caller={caller} url={req.url} task={req.task}",
+        f"[Captain America] score_source caller={caller} url={req.url} task={req.task}",
         file=sys.stderr,
         flush=True,
     )

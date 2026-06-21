@@ -1,13 +1,10 @@
-// API client for the AgentShield FastAPI engine + a tiny sessionStorage result
+// API client for the Captain America FastAPI engine + a tiny sessionStorage result
 // store so the Source Detail screen can read a result by trace_id without refetch.
 
 import { useEffect, useSyncExternalStore } from "react";
 import type {
-  ComparisonPair,
   DemoSource,
   EvalMetrics,
-  FeedbackForm,
-  ModelStatus,
   ResearchResponse,
   ScoreResponse,
 } from "./types";
@@ -45,7 +42,7 @@ export async function scoreSource(url: string, task: string): Promise<ScoreRespo
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-AgentShield-Caller": "dashboard",
+      "X-Captain-America-Caller": "dashboard",
     },
     body: JSON.stringify({ url, task }),
   });
@@ -62,44 +59,6 @@ export async function getHealth(): Promise<{
   cache_backend: string;
 }> {
   return json(await fetch(`${API_URL}/api/health`));
-}
-
-export async function createPair(
-  task: string,
-  url_a: string,
-  url_b: string,
-): Promise<ComparisonPair> {
-  const res = await fetch(`${API_URL}/api/terac/pairs`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ task, url_a, url_b }),
-  });
-  return json<ComparisonPair>(res);
-}
-
-export async function nextPair(): Promise<ComparisonPair | null> {
-  return json(await fetch(`${API_URL}/api/terac/pairs/next`));
-}
-
-export async function submitLabel(
-  pair_id: string,
-  winner: "a" | "b" | "tie",
-  checklist: FeedbackForm,
-): Promise<{ ok: boolean; label_count: number }> {
-  const res = await fetch(`${API_URL}/api/terac/labels`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pair_id, winner, checklist }),
-  });
-  return json(res);
-}
-
-export async function trainModel(): Promise<ModelStatus> {
-  return json(await fetch(`${API_URL}/api/terac/train`, { method: "POST" }));
-}
-
-export async function getModelStatus(): Promise<ModelStatus> {
-  return json(await fetch(`${API_URL}/api/terac/model`));
 }
 
 /** Runs the demo API and falls back to deterministic local results offline. */
@@ -129,14 +88,14 @@ export async function getEvalMetrics(): Promise<EvalMetrics> {
 export async function runResearch(prompt: string, maxSources = 20): Promise<ResearchResponse> {
   const response = await fetch(`${API_URL}/api/research`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-AgentShield-Caller": "research-demo" },
+    headers: { "Content-Type": "application/json", "X-Captain-America-Caller": "research-demo" },
     body: JSON.stringify({ prompt, max_sources: maxSources }),
   });
   return json<ResearchResponse>(response);
 }
 
 // --- session result store (client-only, via useSyncExternalStore) -------- //
-const STORE_KEY = "agentshield:results";
+const STORE_KEY = "captain-america:results";
 const EMPTY: ScoreResponse[] = [];
 const listeners = new Set<() => void>();
 let cache: ScoreResponse[] | null = null;
