@@ -18,6 +18,15 @@
     "sentry": {
       "type": "http",
       "url": "https://mcp.sentry.dev/mcp"
+    },
+    "agentshield": {
+      "command": "/Users/Doanh/Documents/Projects/AIHackBerk/backend/.venv/bin/python",
+      "args": [
+        "/Users/Doanh/Documents/Projects/AIHackBerk/backend/mcp_server.py"
+      ],
+      "env": {
+        "AGENTSHIELD_API_URL": "http://localhost:8000"
+      }
     }
   }
 }

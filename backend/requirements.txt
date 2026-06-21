@@ -18,7 +18,7 @@ anthropic>=0.40.0           # Claude extractor + credibility capsule (optional, 
 # Redis cache + rolling reputation:
 # redis>=5.2.0
 # Observability:
-# sentry-sdk>=2.18.0
+sentry-sdk>=2.18.0
 # arize-phoenix-otel>=0.6.0
 # openinference-instrumentation-anthropic>=0.1.6
 # openinference-instrumentation-httpx>=0.1.0

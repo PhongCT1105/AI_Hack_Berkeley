@@ -68,3 +68,11 @@ def health():
         },
         "cache_backend": getattr(getattr(app.state, "cache", None), "backend", "memory"),
     }
+
+
+@app.get("/api/sentry-debug")
+def sentry_debug():
+    """Raise a test exception so Sentry setup can be verified in development."""
+    if not settings.debug:
+        return {"enabled": False, "reason": "Only available when DEBUG=true"}
+    raise RuntimeError("AgentShield Sentry debug event")
