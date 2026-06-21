@@ -38,6 +38,10 @@
       "env": {
         "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
       }
+    }, 
+    "agentshield": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://agentshield-mcp.onrender.com/mcp"]
     }
   }
 }

@@ -1,21 +1,17 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppNav } from "@/components/app-nav";
 
-// Hanken Grotesk: the display/body face for the Captain America design system
-const hankenGrotesk = Hanken_Grotesk({
-  variable: "--font-hanken",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
   display: "swap",
 });
 
-// JetBrains Mono for trace IDs, token counts, code snippets
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -29,8 +25,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // No "dark" class — full light mode
-    <html lang="en" className={`${hankenGrotesk.variable} ${jetbrainsMono.variable} h-full`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-background text-foreground antialiased">
         <AppNav />
         <main className="flex-1 pb-20 md:pb-0">{children}</main>
