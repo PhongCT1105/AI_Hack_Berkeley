@@ -11,3 +11,21 @@ httpx>=0.27.0
 anthropic>=0.40.0
 # Optional for PromptCompressor LLMLingua-2 backend:
 # llmlingua>=0.2.2
+# --- Captain America engine ---
+selectolax>=0.3.21          # fast HTML parsing for the httpx fallback collector
+anthropic>=0.40.0           # Claude extractor + credibility capsule (optional, has_anthropic)
+
+# --- Optional integrations (import-guarded; absence degrades gracefully) ---
+# Firecrawl is called through its HTTP API with httpx; no browser runtime is needed.
+# Redis cache + rolling reputation:
+# redis>=5.2.0
+# Observability:
+# sentry-sdk>=2.18.0
+# arize-phoenix-otel>=0.6.0
+# openinference-instrumentation-anthropic>=0.1.6
+# openinference-instrumentation-httpx>=0.1.0
+# MCP server:
+fastmcp>=2.0.0
+# Text credibility classifier trained from labeled Supabase tasks.
+scikit-learn>=1.5.0
+joblib>=1.4.0
