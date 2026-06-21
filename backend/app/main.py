@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.crawl import router as crawl_router
-from app.api import history, score, terac
+from app.api import demo, history, research, score, terac
 from app.core.cache import Cache
 from app.core.config import settings
 from app.core.observability import init_observability
@@ -45,6 +45,8 @@ app.include_router(crawl_router)
 app.include_router(score.router)
 app.include_router(terac.router)
 app.include_router(history.router)
+app.include_router(demo.router)
+app.include_router(research.router)
 
 
 @app.get("/")

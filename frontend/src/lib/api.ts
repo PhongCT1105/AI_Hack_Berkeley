@@ -4,10 +4,21 @@
 import { useEffect, useSyncExternalStore } from "react";
 import type {
   ComparisonPair,
+  DemoSource,
+  EvalMetrics,
   FeedbackForm,
   ModelStatus,
+  ResearchResponse,
   ScoreResponse,
 } from "./types";
+import {
+  classifyUrl,
+  DEFAULT_DEMO_TASK,
+  DEFAULT_DEMO_URLS,
+  MOCK_EVAL,
+} from "./mock-demo-data";
+
+export { DEFAULT_DEMO_TASK, DEFAULT_DEMO_URLS };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -89,6 +100,39 @@ export async function trainModel(): Promise<ModelStatus> {
 
 export async function getModelStatus(): Promise<ModelStatus> {
   return json(await fetch(`${API_URL}/api/terac/model`));
+}
+
+/** Runs the demo API and falls back to deterministic local results offline. */
+export async function runDemo(task: string, urls: string[]): Promise<DemoSource[]> {
+  const targets = urls.length ? urls : DEFAULT_DEMO_URLS;
+  try {
+    const response = await fetch(`${API_URL}/api/demo-run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task, urls: targets }),
+    });
+    return await json<DemoSource[]>(response);
+  } catch {
+    return targets.map((url, index) => classifyUrl(url, task, index));
+  }
+}
+
+/** Returns evaluation metrics with a deterministic fallback for local UI work. */
+export async function getEvalMetrics(): Promise<EvalMetrics> {
+  try {
+    return await json<EvalMetrics>(await fetch(`${API_URL}/api/eval`));
+  } catch {
+    return MOCK_EVAL;
+  }
+}
+
+export async function runResearch(prompt: string, maxSources = 20): Promise<ResearchResponse> {
+  const response = await fetch(`${API_URL}/api/research`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-AgentShield-Caller": "research-demo" },
+    body: JSON.stringify({ prompt, max_sources: maxSources }),
+  });
+  return json<ResearchResponse>(response);
 }
 
 // --- session result store (client-only, via useSyncExternalStore) -------- //

@@ -24,6 +24,6 @@ anthropic>=0.40.0           # Claude extractor + credibility capsule (optional, 
 # openinference-instrumentation-httpx>=0.1.0
 # MCP server:
 fastmcp>=2.0.0
-# Terac-trained ranker (when training is wired — see app/ml/trainer.py):
-# scikit-learn>=1.5.0
-# joblib>=1.4.0
+# Text credibility classifier trained from labeled Supabase tasks.
+scikit-learn>=1.5.0
+joblib>=1.4.0

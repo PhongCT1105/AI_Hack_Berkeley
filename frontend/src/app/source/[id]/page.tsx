@@ -24,14 +24,14 @@ export default function SourceDetail() {
   if (r === null) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-        <span className="flex size-14 mx-auto items-center justify-center rounded-full bg-violet-50">
-          <ShieldCheck className="size-6 text-violet-400" />
+        <span className="flex size-14 mx-auto items-center justify-center rounded-full bg-secondary">
+          <ShieldCheck className="size-6 text-primary" />
         </span>
-        <p className="mt-4 text-base font-medium text-gray-800">Result not found in this session</p>
-        <p className="mt-1 text-sm text-gray-500">Navigate back to the dashboard and analyze a source first.</p>
+        <p className="mt-4 text-base font-medium text-foreground">Result not found in this session</p>
+        <p className="mt-1 text-sm text-muted-foreground">Navigate back to the dashboard and analyze a source first.</p>
         <Link
           href="/"
-          className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-700"
+          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:brightness-110"
         >
           <ArrowLeft className="size-4" /> Back to Dashboard
         </Link>
@@ -56,14 +56,14 @@ export default function SourceDetail() {
     <div className="mx-auto max-w-6xl px-6 py-8">
 
       {/* Breadcrumb */}
-      <nav className="mb-5 flex items-center gap-1.5 text-sm text-gray-400">
-        <Link href="/" className="hover:text-violet-600 transition-colors">Dashboard</Link>
+      <nav className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-primary transition-colors">Dashboard</Link>
         <ChevronRight className="size-3.5" />
-        <span className="text-gray-700 font-medium">{r.domain}</span>
+        <span className="text-foreground font-medium">{r.domain}</span>
       </nav>
 
       {/* Hero card */}
-      <Card className="mb-6 overflow-hidden border-gray-200 shadow-sm">
+      <Card className="mb-6 overflow-hidden">
         {/* Top section */}
         <div className="flex flex-col gap-6 p-6 md:flex-row md:items-center">
 
@@ -74,24 +74,24 @@ export default function SourceDetail() {
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-start gap-3">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">{r.domain}</h1>
+                <h1 className="text-xl font-bold text-foreground">{r.domain}</h1>
                 <a
                   href={r.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-violet-600 transition-colors"
+                  className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
                   <span className="max-w-[52ch] truncate">{r.url}</span>
                   <ExternalLink className="size-3 shrink-0" />
                 </a>
               </div>
             </div>
-            <p className="mt-2 text-xs text-gray-500">
-              Task: <span className="text-gray-700">{r.task}</span>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Task: <span className="text-foreground">{r.task}</span>
             </p>
 
             {/* Recommendation badge */}
-            <div className={`mt-4 inline-flex items-center gap-2 rounded-lg border px-4 py-2 ${recColors.bg} ${recColors.border}`}>
+            <div className={`mt-4 inline-flex items-center gap-2 rounded border px-4 py-2 ${recColors.bg} ${recColors.border}`}>
               <span className={`text-sm font-semibold ${recColors.text}`}>
                 {recLabel(r.recommendation)}
               </span>
@@ -100,7 +100,7 @@ export default function SourceDetail() {
         </div>
 
         {/* Metadata bar */}
-        <div className="flex flex-wrap gap-x-5 gap-y-1 border-t border-gray-100 bg-gray-50 px-6 py-2.5 text-xs text-gray-400">
+        <div className="flex flex-wrap gap-x-5 gap-y-1 border-t border-border bg-muted px-6 py-2.5 text-xs text-muted-foreground">
           {[
             ["Scorer",    r.scorer_mode],
             ["Collector", f.collector_mode],
@@ -110,7 +110,7 @@ export default function SourceDetail() {
           ].map(([k, v]) => (
             <span key={k}>
               {k}:{" "}
-              <span className="font-mono text-gray-700">{v}</span>
+              <span className="font-mono text-foreground">{v}</span>
             </span>
           ))}
         </div>
@@ -120,10 +120,10 @@ export default function SourceDetail() {
       <div className="grid gap-5 lg:grid-cols-2">
 
         {/* Verdicts */}
-        <Card className="border-gray-200 shadow-sm">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <ShieldCheck className="size-4 text-violet-500" />
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <ShieldCheck className="size-4 text-primary" />
               Credibility Verdicts
             </CardTitle>
           </CardHeader>
@@ -131,7 +131,7 @@ export default function SourceDetail() {
             {r.verdicts.map((v, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50/60 p-3 hover:border-gray-200 transition-colors"
+                className="flex items-start gap-3 rounded border border-border bg-muted/60 p-3 hover:border-foreground/20 transition-colors"
               >
                 <span
                   className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
@@ -142,10 +142,10 @@ export default function SourceDetail() {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium capitalize text-gray-800">{v.dimension}</span>
-                    <span className="shrink-0 text-xs text-gray-400">weight {v.weight}</span>
+                    <span className="text-sm font-medium capitalize text-foreground">{v.dimension}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">weight {v.weight}</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">{v.detail}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{v.detail}</p>
                 </div>
               </div>
             ))}
@@ -154,9 +154,9 @@ export default function SourceDetail() {
 
         {/* Right column: Risk + Source signals */}
         <div className="space-y-5">
-          <Card className="border-gray-200 shadow-sm">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-gray-900">Risk Flags</CardTitle>
+              <CardTitle className="text-foreground">Risk Flags</CardTitle>
             </CardHeader>
             <CardContent>
               {r.risk_tags.length === 0 ? (
@@ -173,10 +173,10 @@ export default function SourceDetail() {
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 shadow-sm">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-900">
-                <Cpu className="size-4 text-violet-500" />
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <Cpu className="size-4 text-primary" />
                 Source Signals
               </CardTitle>
             </CardHeader>
@@ -200,23 +200,23 @@ export default function SourceDetail() {
         </div>
 
         {/* Claims */}
-        <Card className="border-gray-200 shadow-sm">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-gray-900">Extracted Claims</CardTitle>
+            <CardTitle className="text-foreground">Extracted Claims</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {r.claims.length === 0 ? (
-              <p className="text-sm text-gray-400">No notable claims extracted from this source.</p>
+              <p className="text-sm text-muted-foreground">No notable claims extracted from this source.</p>
             ) : (
               r.claims.map((c, i) => (
-                <div key={i} className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
-                  <p className="text-sm text-gray-800">&ldquo;{c.text}&rdquo;</p>
+                <div key={i} className="rounded border border-border bg-muted/60 p-3">
+                  <p className="text-sm text-foreground">&ldquo;{c.text}&rdquo;</p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Badge tone={c.supported ? "success" : "danger"}>
                       {c.supported ? "Evidence found" : "Unsupported"}
                     </Badge>
                     {c.evidence_snippet && (
-                      <span className="truncate text-xs text-gray-400">{c.evidence_snippet}</span>
+                      <span className="truncate text-xs text-muted-foreground/70">{c.evidence_snippet}</span>
                     )}
                   </div>
                 </div>
@@ -226,10 +226,10 @@ export default function SourceDetail() {
         </Card>
 
         {/* Credibility Capsule */}
-        <Card className="border-gray-200 shadow-sm">
+        <Card className="overflow-hidden">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-900">
-              <FileText className="size-4 text-violet-500" />
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              <FileText className="size-4 text-primary" />
               Credibility Capsule
               <Badge tone="purple" className="ml-auto">Token Company</Badge>
             </CardTitle>
@@ -237,29 +237,29 @@ export default function SourceDetail() {
           <CardContent>
             {/* Token compression stats */}
             <div className="mb-4 flex items-center gap-2.5">
-              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-center">
-                <p className="text-xs text-gray-400">Before</p>
-                <p className="font-mono text-sm font-semibold text-gray-700">{capsule.token_estimate_before} tok</p>
+              <div className="rounded border border-border bg-muted px-3 py-2 text-center">
+                <p className="text-xs text-muted-foreground">Before</p>
+                <p className="font-mono text-sm font-semibold text-foreground">{capsule.token_estimate_before} tok</p>
               </div>
-              <div className="text-gray-300">→</div>
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
+              <div className="text-muted-foreground/50">→</div>
+              <div className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
                 <p className="text-xs text-emerald-600">After</p>
                 <p className="font-mono text-sm font-semibold text-emerald-700">{capsule.token_estimate_after} tok</p>
               </div>
               {reduction > 0 && (
                 <Badge tone="success" className="ml-1">−{reduction}% context saved</Badge>
               )}
-              <span className="ml-auto text-xs text-gray-400">{capsule.method}</span>
+              <span className="ml-auto text-xs text-muted-foreground">{capsule.method}</span>
             </div>
 
-            <p className="rounded-lg border border-gray-100 bg-gray-50 p-3.5 text-sm leading-relaxed text-gray-700">
+            <p className="console-theme rounded p-3.5 text-sm leading-relaxed font-mono">
               {capsule.compressed_text || "—"}
             </p>
             {capsule.key_reasons.length > 0 && (
               <ul className="mt-3 space-y-1.5">
                 {capsule.key_reasons.map((reason, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-gray-500">
-                    <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-violet-400" />
+                  <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-primary/60" />
                     {reason}
                   </li>
                 ))}
@@ -270,7 +270,7 @@ export default function SourceDetail() {
       </div>
 
       {r.degradations.length > 0 && (
-        <div className="mt-5 rounded-lg border border-amber-100 bg-amber-50 px-4 py-2.5 text-xs text-amber-700">
+        <div className="mt-5 rounded border border-amber-100 bg-amber-50 px-4 py-2.5 text-xs text-amber-700">
           <span className="font-medium">Fallbacks used:</span> {r.degradations.join(" · ")}
         </div>
       )}
@@ -290,7 +290,7 @@ function ScoreRing({ score }: { score: number }) {
   return (
     <div className="flex shrink-0 flex-col items-center gap-1">
       <svg width="100" height="100" viewBox="0 0 100 100" className="-rotate-90">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="#F3F4F6" strokeWidth="9" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="var(--muted)" strokeWidth="9" />
         <circle
           cx="50" cy="50" r={r}
           fill="none"
@@ -305,7 +305,7 @@ function ScoreRing({ score }: { score: number }) {
       <div className="absolute flex flex-col items-center" style={{ marginTop: 22 }}>
         <span className="text-2xl font-bold tabular-nums" style={{ color }}>{score}</span>
       </div>
-      <span className="text-xs font-medium text-gray-500 -mt-1">{label}</span>
+      <span className="text-xs font-medium text-muted-foreground -mt-1">{label}</span>
     </div>
   );
 }
@@ -315,10 +315,10 @@ function ScoreRing({ score }: { score: number }) {
 function Signal({ label, ok, extra }: { label: string; ok: boolean; extra?: string }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-gray-500">{label}</span>
+      <span className="text-muted-foreground">{label}</span>
       <span className={`flex items-center gap-1 font-medium ${ok ? "text-emerald-600" : "text-red-500"}`}>
         {ok ? <Check className="size-3.5" /> : <X className="size-3.5" />}
-        {extra && <span className="text-xs text-gray-400">{extra}</span>}
+        {extra && <span className="text-xs text-muted-foreground/70">{extra}</span>}
       </span>
     </div>
   );
@@ -327,8 +327,8 @@ function Signal({ label, ok, extra }: { label: string; ok: boolean; extra?: stri
 function Metric({ label, value, bad }: { label: string; value: string; bad?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-gray-500">{label}</span>
-      <span className={`font-medium ${bad ? "text-red-500" : "text-gray-800"}`}>{value}</span>
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`font-medium ${bad ? "text-red-500" : "text-foreground"}`}>{value}</span>
     </div>
   );
 }
