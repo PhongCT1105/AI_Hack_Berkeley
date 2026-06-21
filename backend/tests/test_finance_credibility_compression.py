@@ -3,8 +3,6 @@ from __future__ import annotations
 
 import unittest
 
-from app.api.compress import compress as compress_api
-from app.schemas.compress import CompressionRequest
 from app.schemas.score import SourceFeatures
 from app.services.capsule import compress as compress_capsule
 from app.services.collector import CollectResult
@@ -20,13 +18,6 @@ It has never lost money in market crashes.
 
 
 class FinanceCredibilityCompressionTests(unittest.IsolatedAsyncioTestCase):
-    def test_api_defaults_to_the_finance_compressor(self) -> None:
-        result = compress_api(CompressionRequest(text=SOURCE))
-
-        self.assertEqual(result.method, "finance_credibility")
-        self.assertIn("ret=guaranteed 18%/yr", result.compressed_text)
-        self.assertIn("reg=no SEC filing", result.compressed_text)
-
     async def test_scoring_capsule_uses_finance_compressor_and_keeps_verdict_context(self) -> None:
         capsule = await compress_capsule(
             CollectResult(

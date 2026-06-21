@@ -23,8 +23,7 @@ logger = logging.getLogger("captain_ddoski.supabase_writer")
 async def insert_task_row(row: dict) -> str | None:
     """Insert one source_claim_tasks row. Returns the row's task_id on
     success, None on any failure (unconfigured or request error) — best
-    effort, never raises, mirroring terac_client.push_pair's local-only
-    fallback philosophy."""
+    effort, never raises."""
     tracer = get_tracer()
     with tracer.start_as_current_span("captain_ddoski.supabase.insert_task") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)

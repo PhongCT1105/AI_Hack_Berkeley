@@ -187,8 +187,7 @@ Captain Ddoski includes a finance-focused compression demo for The Token Company
 It turns long crawled source context into compact credibility capsules for finance AI agents,
 preserving source URL, author, citations, dates, claims, risk tags, numbers, and institutions.
 
-- API: `POST /api/compress`
-- Demo: `http://localhost:3000/compress`
+- Demo: the `/eval` page's "Compression Quality Evaluation" panel
 - Eval: `backend/.venv/bin/python backend/scripts/eval_compression.py`
 - Claude API eval: `backend/.venv/bin/python backend/scripts/eval_claude_compression.py`
 
@@ -207,7 +206,8 @@ Each run compares three variants: the raw prompt, the Captain Ddoski credibility
 capsule, and The Token Company Bear-2 compression. It saves every input, Claude
 output, real input token count, and quality metric to
 `backend/data/compression_evaluations/`. The latest run is also available from
-`GET /api/compress/evaluations/latest` for the `/compress` visualization.
+`GET /api/compress/evaluations/latest`, which the `/eval` page reads for its
+compression visualization.
 Quality is measured against the uncompressed output using exact
 citation-decision agreement, JSON validity, unigram F1, and precision/recall/F1
 for critical numbers, URLs, and named entities.

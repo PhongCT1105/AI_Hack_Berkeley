@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 
-from app.ml import model_registry, terac_client, terac_store, trainer
+from app.ml import model_registry, terac_store, trainer
 from app.schemas.terac import (
     ComparisonPair,
     CreatePairRequest,
@@ -26,7 +26,6 @@ async def create_pair(body: CreatePairRequest, request: Request) -> ComparisonPa
     """Score two sources for the same task and store them as a comparison pair."""
     pipeline = request.app.state.pipeline
     pair = await build_pair(pipeline, body.task, body.url_a, body.url_b)
-    terac_client.push_pair(pair)
     return ComparisonPair(**pair)
 
 

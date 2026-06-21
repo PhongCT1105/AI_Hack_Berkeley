@@ -2,9 +2,9 @@
 
 TERAC_API_URL (https://terac.com/api/mcp) speaks MCP — JSON-RPC tool calls
 over streamable HTTP — not a plain REST API, so this opens a short-lived MCP
-session per call rather than a simple httpx.post like terac_client.py's local
-arena mirror. Used by app/services/terac_auto_launch.py to create and launch
-real, paid opportunities.
+session per call rather than a simple httpx.post. Used by
+app/services/terac_auto_launch.py to create and launch real, paid
+opportunities.
 """
 from __future__ import annotations
 
