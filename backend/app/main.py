@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.crawl import router as crawl_router
 from app.api import history, score, terac
 from app.core.cache import Cache
 from app.core.config import settings
@@ -40,6 +41,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(crawl_router)
 app.include_router(score.router)
 app.include_router(terac.router)
 app.include_router(history.router)

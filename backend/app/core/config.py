@@ -4,11 +4,15 @@ Every external integration is OPTIONAL. The app must boot and return a valid
 heuristic ScoreResponse with zero keys set. Each service checks a `has_*`
 capability flag (never a raw key) and falls back to an in-process path.
 """
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+
+
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 
     app_name: str = "AgentShield API"
     debug: bool = True
@@ -22,6 +26,8 @@ class Settings(BaseSettings):
 
     browserbase_api_key: str | None = None
     browserbase_project_id: str | None = None
+    browserbase_page_timeout_ms: int = 60000
+    browserbase_max_text_chars: int = 12000
 
     redis_url: str | None = None              # absent -> in-memory cache
 
