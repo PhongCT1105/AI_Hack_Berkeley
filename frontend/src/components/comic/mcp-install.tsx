@@ -75,7 +75,7 @@ export function McpInstall() {
           </button>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Run the command, then <code className="font-mono">/mcp</code> inside Claude Code to authenticate.
+          Run the command, then <code className="font-mono">/mcp</code> inside Claude Code to list.
         </p>
       </div>
     </ComicPanel>
