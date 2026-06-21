@@ -42,6 +42,37 @@ cd backend && python mcp_server.py          # or: claude mcp add agentshield -- 
 → `backend/.env` to add keys (all optional). Phoenix skills:
 `npx skills add Arize-ai/phoenix --skill phoenix-tracing --skill phoenix-evals --skill phoenix-cli`.
 
+## Claude MCP demo
+
+AgentShield is registered as a local stdio MCP server named `agentshield`.
+
+```bash
+# 1. Start the scoring engine.
+cd backend
+DEBUG=true .venv/bin/python -m uvicorn app.main:app --port 8000
+
+# 2. Register the MCP server with Claude Code.
+claude mcp add agentshield -- \
+  /absolute/path/to/backend/.venv/bin/python \
+  /absolute/path/to/backend/mcp_server.py
+
+# 3. Confirm it is connected.
+claude mcp list
+
+# 4. Run a deterministic test prompt.
+claude -p "Use AgentShield MCP to score https://best-stock-picks-now.com/double-your-money for this task: Research low-risk retirement investments. Return recommendation, score, and risk tags." \
+  --allowedTools mcp__agentshield__agentshield_score_source
+```
+
+The backend terminal logs Claude-originated calls like:
+
+```text
+[AgentShield] score_source caller=claude-mcp url=https://best-stock-picks-now.com/double-your-money task=Research low-risk retirement investments
+```
+
+The backend also records those calls in `GET /api/results` and grouped flagged domains in
+`GET /api/threats`, so the frontend can hydrate dashboard/threat feed history from MCP calls.
+
 ---
 
 ## Scaffold reference

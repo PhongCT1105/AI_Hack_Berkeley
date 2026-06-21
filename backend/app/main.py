@@ -8,13 +8,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import score, terac
+from app.api import history, score, terac
 from app.core.cache import Cache
 from app.core.config import settings
 from app.core.observability import init_observability
 from app.ml import model_registry
 from app.services.collector import Collector
 from app.services.extractor import Extractor
+from app.services.history import ScoreHistory
 from app.services.pipeline import Pipeline
 
 
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
     init_observability()
     cache = Cache()
     app.state.cache = cache
+    app.state.score_history = ScoreHistory(settings.score_history_path)
     app.state.pipeline = Pipeline(Collector(), Extractor(), cache)
     model_registry.load()  # silent if no trained model exists (UI-only Terac build)
     yield
@@ -40,6 +42,7 @@ app.add_middleware(
 
 app.include_router(score.router)
 app.include_router(terac.router)
+app.include_router(history.router)
 
 
 @app.get("/")

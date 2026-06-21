@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     capsule_token_budget: int = 220
     ml_model_path: str = "data/terac_model.joblib"
     terac_store_path: str = "data/terac_store.json"
+    score_history_path: str = "data/score_history.json"
 
     @property
     def cors_origins_list(self) -> list[str]:

@@ -13,20 +13,42 @@ Env:   AGENTSHIELD_API_URL (default http://localhost:8000)
 """
 from __future__ import annotations
 
+import logging
 import os
+import sys
+from typing import Annotated, Any
 
 import httpx
 from fastmcp import FastMCP
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 API_URL = os.environ.get("AGENTSHIELD_API_URL", "http://localhost:8000")
+
+logging.basicConfig(
+    level=os.environ.get("AGENTSHIELD_MCP_LOG_LEVEL", "INFO"),
+    stream=sys.stderr,
+    format="%(asctime)s %(levelname)s [agentshield.mcp] %(message)s",
+)
+logger = logging.getLogger("agentshield.mcp")
 
 mcp = FastMCP("agentshield_mcp")
 
 
-class ScoreSourceInput(BaseModel):
-    url: str = Field(..., description="The finance web source URL to evaluate")
-    task: str = Field(..., description="What you intend to do with this source")
+@mcp.tool(
+    name="agentshield_demo_sources",
+    description=(
+        "Return deterministic finance source URLs for testing AgentShield MCP calls. "
+        "Use one trusted and one risky URL when you need a quick demo."
+    ),
+    annotations={"readOnlyHint": True, "idempotentHint": True, "openWorldHint": False},
+)
+async def agentshield_demo_sources() -> dict[str, Any]:
+    logger.info("tool=agentshield_demo_sources")
+    return {
+        "task": "Research low-risk retirement investments for a consumer-facing finance agent.",
+        "trusted": "https://www.sec.gov/investor/pubs/assetallocation.htm",
+        "risky": "https://best-stock-picks-now.com/double-your-money",
+    }
 
 
 @mcp.tool(
@@ -40,21 +62,40 @@ class ScoreSourceInput(BaseModel):
     ),
     annotations={"readOnlyHint": True, "idempotentHint": True, "openWorldHint": True},
 )
-async def agentshield_score_source(params: ScoreSourceInput) -> dict:
+async def agentshield_score_source(
+    url: Annotated[str, Field(description="The finance web source URL to evaluate")],
+    task: Annotated[str, Field(description="What you intend to do with this source")],
+) -> dict:
+    logger.info("tool=agentshield_score_source url=%s task=%s", url, task)
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
                 f"{API_URL}/api/score-source",
-                json={"url": params.url, "task": params.task},
+                headers={"X-AgentShield-Caller": "claude-mcp"},
+                json={"url": url, "task": task},
             )
             resp.raise_for_status()
-            return resp.json()
+            payload = resp.json()
+            logger.info(
+                "result trace_id=%s domain=%s score=%s recommendation=%s risk_tags=%s",
+                payload.get("trace_id"),
+                payload.get("domain"),
+                payload.get("trust_score"),
+                payload.get("recommendation"),
+                payload.get("risk_tags"),
+            )
+            return payload
     except httpx.ConnectError as exc:
+        logger.exception("engine unreachable api_url=%s", API_URL)
         raise RuntimeError(
             f"AgentShield engine unreachable at {API_URL}. Start it with: "
             f"cd backend && uvicorn app.main:app --reload"
         ) from exc
+    except httpx.HTTPStatusError as exc:
+        logger.exception("engine returned error status=%s body=%s", exc.response.status_code, exc.response.text)
+        raise
 
 
 if __name__ == "__main__":
+    logger.info("starting AgentShield MCP server api_url=%s", API_URL)
     mcp.run()  # stdio transport

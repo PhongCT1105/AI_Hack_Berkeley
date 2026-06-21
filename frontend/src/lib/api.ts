@@ -1,7 +1,7 @@
 // API client for the AgentShield FastAPI engine + a tiny sessionStorage result
 // store so the Source Detail screen can read a result by trace_id without refetch.
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import type {
   ComparisonPair,
   FeedbackForm,
@@ -10,6 +10,16 @@ import type {
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+interface ScoreHistoryItem {
+  received_at: string;
+  caller: string;
+  request: {
+    url: string;
+    task: string;
+  };
+  response: ScoreResponse;
+}
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -22,10 +32,17 @@ async function json<T>(res: Response): Promise<T> {
 export async function scoreSource(url: string, task: string): Promise<ScoreResponse> {
   const res = await fetch(`${API_URL}/api/score-source`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-AgentShield-Caller": "dashboard",
+    },
     body: JSON.stringify({ url, task }),
   });
   return json<ScoreResponse>(res);
+}
+
+export async function getResults(): Promise<ScoreHistoryItem[]> {
+  return json(await fetch(`${API_URL}/api/results`));
 }
 
 export async function getHealth(): Promise<{
@@ -79,6 +96,7 @@ const STORE_KEY = "agentshield:results";
 const EMPTY: ScoreResponse[] = [];
 const listeners = new Set<() => void>();
 let cache: ScoreResponse[] | null = null;
+let refreshInFlight: Promise<void> | null = null;
 
 function read(): ScoreResponse[] {
   if (typeof window === "undefined") return EMPTY;
@@ -107,7 +125,41 @@ export function saveResult(r: ScoreResponse): void {
   listeners.forEach((l) => l());
 }
 
+export async function refreshResults(): Promise<void> {
+  if (typeof window === "undefined") return;
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = getResults()
+    .then((items) => {
+      const remote = items
+        .map((item) => ({
+          ...item.response,
+          analyzed_at: item.received_at,
+          caller: item.caller,
+        }))
+        .filter((item) => item.trace_id);
+      const merged = [
+        ...remote,
+        ...snapshot().filter((local) => !remote.some((item) => item.trace_id === local.trace_id)),
+      ];
+      cache = merged;
+      sessionStorage.setItem(STORE_KEY, JSON.stringify(cache));
+      listeners.forEach((l) => l());
+    })
+    .catch(() => {
+      // The UI remains usable with sessionStorage-only results when the backend is offline.
+    })
+    .finally(() => {
+      refreshInFlight = null;
+    });
+
+  return refreshInFlight;
+}
+
 /** Subscribe a component to the session result list. */
 export function useResults(): ScoreResponse[] {
+  useEffect(() => {
+    void refreshResults();
+  }, []);
   return useSyncExternalStore(subscribe, snapshot, () => EMPTY);
 }
