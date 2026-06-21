@@ -172,6 +172,14 @@ export default function ComparePage() {
   );
 }
 
+// These signals are still scored on the backend; we just don't surface them
+// as standalone badges here since they read as noise on the comparison card.
+const HIDDEN_RISK_TAGS = new Set(["no author", "no citations", "insecure transport"]);
+
+function visibleRiskTags(tags: string[]): string[] {
+  return tags.filter((tag) => !HIDDEN_RISK_TAGS.has(tag));
+}
+
 function RowPair({ row }: { row: ComparisonRow }) {
   const disagree = row.weak.recommendation !== row.better.recommendation;
   return (
@@ -217,9 +225,9 @@ function SideCard({
           </div>
         </div>
 
-        {side.risk_tags.length > 0 && (
+        {visibleRiskTags(side.risk_tags).length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
-            {side.risk_tags.map((tag) => (
+            {visibleRiskTags(side.risk_tags).map((tag) => (
               <span key={tag} className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                 {tag}
               </span>
