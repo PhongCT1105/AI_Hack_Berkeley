@@ -1,4 +1,4 @@
-"""HTTP MCP server for Captain Ddoski compression tools."""
+"""HTTP MCP server for Captain Ddoski — credibility scoring + compression tools."""
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -7,7 +7,12 @@ from typing import Literal
 from fastapi import FastAPI
 from fastmcp import FastMCP
 
+from app.core.cache import Cache
 from app.core.config import settings
+from app.schemas.score import ScoreRequest
+from app.services.collector import Collector
+from app.services.extractor import Extractor
+from app.services.pipeline import Pipeline
 from app.services.prompt_compressor import CompressionConfig, PromptCompressor
 from app.services.semantic_ir_compressor import SemanticIRCompressor
 
@@ -17,11 +22,27 @@ CompressionMethod = Literal["semantic_ir", "sentence_selector"]
 mcp = FastMCP(
     name="captain_ddoski",
     instructions=(
-        "Tools for compressing source context into smaller evidence capsules for "
-        "AI agents. Prefer semantic_ir for structured capsules and "
-        "sentence_selector for query-aware sentence reduction."
+        "Captain Ddoski — source trust infrastructure for finance AI agents. "
+        "Use score_source to validate a URL before citing it. "
+        "Use compress_context to shrink long source text into a compact capsule."
     ),
 )
+
+
+@mcp.tool(
+    name="score_source",
+    description=(
+        "Validate the credibility of a finance web source before citing it. "
+        "Returns a trust score (0–100), a USE/CAUTION/AVOID recommendation, "
+        "risk tags, per-dimension verdicts, extracted claims, and a compressed "
+        "evidence capsule. Call this before relying on any web source for a finance task."
+    ),
+)
+async def score_source(url: str, task: str) -> dict:
+    pipeline = Pipeline(Collector(), Extractor(), Cache())
+    req = ScoreRequest(url=url, task=task)
+    result = await pipeline.score_source(req)
+    return result.model_dump()
 
 
 @mcp.tool(
