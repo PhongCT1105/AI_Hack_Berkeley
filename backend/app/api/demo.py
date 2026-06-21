@@ -1,4 +1,4 @@
-"""Captain America demo endpoints — deterministic, mocked-first.
+"""Captain Ddoski demo endpoints — deterministic, mocked-first.
 
 UI-ONLY THIS BUILD: classification below is synthetic (domain prior + keyword
 heuristics), not a real collector/extractor/Firecrawl run. The real pipeline

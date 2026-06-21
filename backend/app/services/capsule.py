@@ -20,7 +20,7 @@ from app.services.collector import CollectResult
 from app.services.extractor import ExtractResult
 from app.services.semantic_ir_compressor import FinanceCredibilityCompressor
 
-logger = logging.getLogger("captain_america.capsule")
+logger = logging.getLogger("captain_ddoski.capsule")
 
 
 def _est_tokens(text: str) -> int:

@@ -34,7 +34,7 @@ type EvaluationReport = {
     task_id: string;
     variants: {
       raw: EvaluationVariant;
-      agentshield?: EvaluationVariant;
+      captain_ddoski?: EvaluationVariant;
       ttc?: EvaluationVariant;
     };
   }>;
@@ -71,7 +71,7 @@ export function ThreeWayCompressionEvaluation() {
   const selected = evaluation?.rows.find((row) => row.task_id === selectedTaskId) ?? evaluation?.rows[0];
   const chartData = variants ? [
     { name: "Raw", tokens: variants.raw?.avg_llm_input_tokens ?? 0, fill: "#a1a1aa" },
-    { name: "AgentShield", tokens: variants.agentshield?.avg_llm_input_tokens ?? 0, fill: "#4648d4" },
+    { name: "Captain Ddoski", tokens: variants.captain_ddoski?.avg_llm_input_tokens ?? 0, fill: "#4648d4" },
     { name: "Token Company", tokens: variants.ttc?.avg_llm_input_tokens ?? 0, fill: "#10b981" },
   ] : [];
 
@@ -80,7 +80,7 @@ export function ThreeWayCompressionEvaluation() {
       <CardHeader className="border-b border-border bg-muted/30">
         <CardTitle className="text-base text-foreground">Compression Quality Evaluation</CardTitle>
         <p className="text-sm font-normal text-muted-foreground">
-          Raw prompts, AgentShield capsules, and The Token Company compression evaluated on the same citation tasks.
+          Raw prompts, Captain Ddoski capsules, and The Token Company compression evaluated on the same citation tasks.
         </p>
       </CardHeader>
       <CardContent className="p-0">
@@ -104,7 +104,7 @@ export function ThreeWayCompressionEvaluation() {
                   </thead>
                   <tbody className="divide-y divide-border/60">
                     <SummaryRow label="Raw prompt" data={variants.raw} baseline />
-                    <SummaryRow label="AgentShield capsule" data={variants.agentshield} />
+                    <SummaryRow label="Captain Ddoski capsule" data={variants.captain_ddoski} />
                     <SummaryRow label="Token Company" data={variants.ttc} />
                   </tbody>
                 </table>
@@ -147,7 +147,7 @@ export function ThreeWayCompressionEvaluation() {
                 </div>
                 <div className="grid divide-y divide-border lg:grid-cols-3 lg:divide-x lg:divide-y-0">
                   <OutputPanel label="Raw prompt" variant={selected.variants.raw} />
-                  <OutputPanel label="AgentShield capsule" variant={selected.variants.agentshield} />
+                  <OutputPanel label="Captain Ddoski capsule" variant={selected.variants.captain_ddoski} />
                   <OutputPanel label="Token Company" variant={selected.variants.ttc} />
                 </div>
               </div>

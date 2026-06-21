@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Menu, Radar, Scale, Shield, ShieldCheck } from "lucide-react";
+import { Activity, Menu, Radar, Scale, ShieldCheck } from "lucide-react";
+import { MascotAvatar } from "@/components/comic/mascot-avatar";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -22,9 +23,9 @@ export function AppNav() {
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6">
           {/* Brand */}
-          <Link href="/" className="flex items-center gap-2.5 active:scale-95 duration-150">
-            <Shield className="size-5 text-primary" />
-            <span className="text-lg font-bold tracking-tighter text-foreground">Captain America</span>
+          <Link href="/" className="flex items-center gap-2 active:scale-95 duration-150">
+            <MascotAvatar pose="standing" size="xs" ring={false} />
+            <span className="font-comic text-xl tracking-tight text-foreground">Captain Ddoski</span>
           </Link>
 
           {/* Nav links */}

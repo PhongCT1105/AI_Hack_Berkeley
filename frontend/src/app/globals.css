@@ -98,13 +98,24 @@
   --sidebar-border:             #c7c4d7;
   --sidebar-ring:               #4648d4;
 
-  /* Captain America extras: surfaces beyond the shadcn token set */
+  /* Captain Ddoski extras: surfaces beyond the shadcn token set */
   --surface-dim:              #cbdbf5;
   --surface-container-low:    #eff4ff;
   --surface-container:        #e5eeff;
   --surface-container-high:   #dce9ff;
   --console-bg:                #0f172a;
   --console-fg:                #d3e4fe;
+
+  /* Comic theme: bright, saturated, halftone-and-ink palette for the
+     Captain Ddoski mascot pages (Threat Feed, callouts, action badges). */
+  --comic-red:     #ff3b3b;
+  --comic-yellow:  #ffd23f;
+  --comic-blue:    #2e6bff;
+  --comic-orange:  #ff8c1a;
+  --comic-purple:  #8c4bff;
+  --comic-green:   #2bd576;
+  --comic-ink:     #14131f;
+  --comic-paper:   #fffaf0;
 }
 
 @layer base {
@@ -167,4 +178,61 @@
 }
 .pulse-dot {
   animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Comic theme utilities — bright ink-and-paper look for mascot
+   pages. Scoped to explicit classes so the rest of the app keeps
+   the muted "Shield Terminal" system untouched.
+   ──────────────────────────────────────────────────────────── */
+.font-comic {
+  font-family: var(--font-comic), var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.comic-zone {
+  background-color: var(--comic-paper);
+  background-image:
+    radial-gradient(color-mix(in oklab, var(--comic-ink) 12%, transparent) 1.4px, transparent 1.4px);
+  background-size: 16px 16px;
+}
+
+.comic-panel {
+  background: #ffffff;
+  border: 3px solid var(--comic-ink) !important;
+  border-radius: 0.75rem;
+  box-shadow: 6px 6px 0px 0px var(--comic-ink);
+}
+
+.comic-panel-tilt {
+  transform: rotate(-0.4deg);
+}
+
+.comic-pop {
+  display: inline-flex;
+  align-items: center;
+  border: 2.5px solid var(--comic-ink);
+  border-radius: 999px;
+  box-shadow: 3px 3px 0px 0px var(--comic-ink);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.comic-burst {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--comic-ink);
+  box-shadow: 4px 4px 0px 0px var(--comic-ink);
+  border-radius: 9999px;
+  font-family: var(--font-comic), sans-serif;
+}
+
+@keyframes comic-wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+.comic-wiggle {
+  animation: comic-wiggle 1.8s ease-in-out infinite;
 }

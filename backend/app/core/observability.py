@@ -14,7 +14,7 @@ import logging
 
 from app.core.config import settings
 
-logger = logging.getLogger("captain_america.observability")
+logger = logging.getLogger("captain_ddoski.observability")
 
 _initialized = False
 _tracer = None
@@ -67,7 +67,7 @@ def init_observability() -> None:
                 # covered by this flag and are instrumented explicitly below.
                 auto_instrument=True,
             )
-            _tracer = tracer_provider.get_tracer("captain_america.pipeline")
+            _tracer = tracer_provider.get_tracer("captain_ddoski.pipeline")
             logger.info("Arize AX tracing initialized (project=%s)", settings.arize_project_name)
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Arize init failed, continuing without it: %s", exc)
@@ -83,10 +83,10 @@ def init_observability() -> None:
             from phoenix.otel import register
 
             tracer_provider = register(
-                project_name="Captain America",
+                project_name="Captain Ddoski",
                 auto_instrument=True,  # picks up anthropic instrumentation if installed
             )
-            _tracer = tracer_provider.get_tracer("captain_america.pipeline")
+            _tracer = tracer_provider.get_tracer("captain_ddoski.pipeline")
             logger.info("Phoenix tracing initialized")
         except Exception as exc:  # pragma: no cover - best effort
             logger.warning("Phoenix init failed, continuing without it: %s", exc)

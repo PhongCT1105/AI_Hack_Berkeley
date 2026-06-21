@@ -14,7 +14,7 @@ from typing import Any
 
 from app.core.config import settings
 
-logger = logging.getLogger("captain_america.citation_model")
+logger = logging.getLogger("captain_ddoski.citation_model")
 
 _model: Any | None = None
 _meta: dict[str, Any] = {}

@@ -1,8 +1,8 @@
-# Captain America engineering guide
+# Captain Ddoski engineering guide
 
 ## Product boundary
 
-Captain America is finance-source credibility infrastructure for AI agents. The product has three
+Captain Ddoski is finance-source credibility infrastructure for AI agents. The product has three
 separate surfaces that must not be presented as the same thing:
 
 - `POST /api/score-source` evaluates a supplied source URL through the real collection and
@@ -23,9 +23,9 @@ Backend: FastAPI in `backend/` (venv at `backend/.venv`).
 - **Backend**: Add routers under `backend/app/api/` and mount them in `app/main.py`. Pydantic
   schemas in `app/schemas/`, models in `app/models/`, business logic in `app/services/`.
   Settings come from `app/core/config.py` (reads `.env`). Run with the venv's interpreter.
-- **Branding**: use `Captain America` for product-facing copy, `captain_america` for new internal
-  identifiers, and `CAPTAIN_AMERICA_*` for new environment variables. The legacy
-  `X-AgentShield-Caller` header and `AGENTSHIELD_*` MCP variables exist only for migration.
+- **Branding**: use `Captain Ddoski` for product-facing copy, `captain_ddoski` for new internal
+  identifiers, and `CAPTAIN_DDOSKI_*` for new environment variables. The legacy
+  `X-Captain Ddoski-Caller` header and `CAPTAIN_DDOSKI_*` MCP variables exist only for migration.
 - **Secrets**: never commit `.env` / `.env.local`. Templates are the `.example` files.
 
 ## MCP & skills

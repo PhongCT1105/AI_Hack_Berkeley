@@ -1,4 +1,4 @@
-"""Compare raw, AgentShield, and The Token Company prompts on citation tasks.
+"""Compare raw, Captain Ddoski, and The Token Company prompts on citation tasks.
 
 The evaluator saves the raw/compressed inputs and both model outputs after
 every item. This makes the run consumable by a later chart or review UI.
@@ -64,7 +64,7 @@ Return exactly this JSON object:
 """
 
 
-def build_agentshield_prompt(item: dict[str, Any], raw_prompt: str) -> tuple[str, str]:
+def build_captain_ddoski_prompt(item: dict[str, Any], raw_prompt: str) -> tuple[str, str]:
     """Build the project-native capsule variant for the same downstream task.
 
     FinanceCredibilityCompressor is the active production compressor. The
@@ -141,7 +141,7 @@ async def evaluate(limit: int, output_dir: Path, concurrency: int, resume: bool 
             "requested_queries": limit,
             "variants": {
                 "raw": "Original, uncompressed task prompt.",
-                "agentshield": "FinanceCredibilityCompressor with Semantic IR fallback for non-finance evidence.",
+                "captain_ddoski": "FinanceCredibilityCompressor with Semantic IR fallback for non-finance evidence.",
                 "ttc": "The Token Company bear-2 compression.",
             },
             "metric_definitions": {
@@ -158,7 +158,7 @@ async def evaluate(limit: int, output_dir: Path, concurrency: int, resume: bool 
     write_lock = asyncio.Lock()
     semaphore = asyncio.Semaphore(concurrency)
 
-    async with AsyncTheTokenCompany(api_key=ttc_key, app_id="captain-america-eval") as compressor:
+    async with AsyncTheTokenCompany(api_key=ttc_key, app_id="captain-ddoski-eval") as compressor:
         client = AsyncAnthropic(api_key=anthropic_key)
 
         async def evaluate_item(item: dict[str, Any]) -> None:
@@ -203,16 +203,16 @@ async def _evaluate_item(
         _write_report(report, output_path, latest_path)
 
     try:
-        agentshield_prompt, agentshield_method = build_agentshield_prompt(item, raw_prompt)
+        captain_ddoski_prompt, captain_ddoski_method = build_captain_ddoski_prompt(item, raw_prompt)
         ttc_result = await compressor.compress(
             raw_prompt,
             model=TTC_MODEL,
             aggressiveness=TTC_AGGRESSIVENESS,
         )
         row["variants"].update({
-            "agentshield": {
-                "input": agentshield_prompt,
-                "compression_method": agentshield_method,
+            "captain_ddoski": {
+                "input": captain_ddoski_prompt,
+                "compression_method": captain_ddoski_method,
             },
             "ttc": {
                 "input": ttc_result.output,
@@ -228,18 +228,18 @@ async def _evaluate_item(
         async with write_lock:
             _write_report(report, output_path, latest_path)
 
-        raw_result, agentshield_result, ttc_model_result = await asyncio.gather(
+        raw_result, captain_ddoski_result, ttc_model_result = await asyncio.gather(
             call_model(client, raw_prompt),
-            call_model(client, agentshield_prompt),
+            call_model(client, captain_ddoski_prompt),
             call_model(client, ttc_result.output),
         )
         row["variants"]["raw"]["result"] = raw_result
-        row["variants"]["agentshield"].update({
-            "result": agentshield_result,
+        row["variants"]["captain_ddoski"].update({
+            "result": captain_ddoski_result,
             "llm_input_token_savings_pct": _savings(
-                raw_result["input_tokens"], agentshield_result["input_tokens"]
+                raw_result["input_tokens"], captain_ddoski_result["input_tokens"]
             ),
-            "quality_vs_raw": quality_metrics(raw_result["output"], agentshield_result["output"]),
+            "quality_vs_raw": quality_metrics(raw_result["output"], captain_ddoski_result["output"]),
         })
         row["variants"]["ttc"].update({
             "result": ttc_model_result,
@@ -267,7 +267,7 @@ def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if completed:
         raw_tokens = [row["variants"]["raw"]["result"]["input_tokens"] for row in completed]
         variants["raw"] = {"avg_llm_input_tokens": round(sum(raw_tokens) / len(raw_tokens), 2)}
-        for name in ("agentshield", "ttc"):
+        for name in ("captain_ddoski", "ttc"):
             items = [row["variants"][name] for row in completed]
             quality = summarize_quality([{"quality": item["quality_vs_raw"]} for item in items])
             variants[name] = {

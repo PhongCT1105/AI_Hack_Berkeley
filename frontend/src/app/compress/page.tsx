@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 
+import { MascotAvatar } from "@/components/comic/mascot-avatar";
 import { Button } from "@/components/ui/button";
 
 type CompressionMethod = "finance_credibility" | "semantic_ir" | "sentence_selector";
@@ -19,7 +20,7 @@ type CompressionResponse = {
 };
 
 const SAMPLE_CONTEXT =
-  "The Token Company challenge asks teams to reduce the amount of information sent to an LLM while preserving the context needed for high-quality outputs. AgentShield should pitch a domain-aware compression system for finance AI agents. The system turns long crawled source context into a credibility capsule that preserves author, citations, dates, claims, risk tags, numbers, and institutions. The demo should show at least 50% token reduction, lower token costs, and no loss in downstream LLM performance on source trust decisions. The compressed representation must remain readable enough for debugging and structured enough for an MCP calling agent.";
+  "The Token Company challenge asks teams to reduce the amount of information sent to an LLM while preserving the context needed for high-quality outputs. Captain Ddoski should pitch a domain-aware compression system for finance AI agents. The system turns long crawled source context into a credibility capsule that preserves author, citations, dates, claims, risk tags, numbers, and institutions. The demo should show at least 50% token reduction, lower token costs, and no loss in downstream LLM performance on source trust decisions. The compressed representation must remain readable enough for debugging and structured enough for an MCP calling agent.";
 
 const SAMPLE_FACTS =
   "50%,token costs,downstream LLM performance,credibility capsule,finance AI agents";
@@ -75,7 +76,12 @@ export default function CompressPage() {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-medium uppercase tracking-normal text-emerald-700">Token Company challenge</p>
+              <div className="mb-2 flex items-center gap-2">
+                <MascotAvatar pose="point" size="xs" />
+                <p className="text-sm font-medium uppercase tracking-normal text-emerald-700">
+                  Captain Ddoski &times; Token Company challenge
+                </p>
+              </div>
               <h1 className="mt-2 text-3xl font-semibold tracking-normal text-zinc-950 sm:text-4xl">Finance source context to credibility capsule</h1>
               <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-600">Domain-aware compression for finance AI agents, tuned for token savings and preserved source-trust facts.</p>
             </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Loader2, Scale, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ComicPageHeader } from "@/components/comic/comic-page-header";
 import { NarrativeBlock } from "@/components/workflow-transcript";
 import { recTone, scoreColor } from "@/lib/score-ui";
 import { cn } from "@/lib/utils";
@@ -77,19 +78,20 @@ export default function ComparePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-      <section className="mb-8 max-w-3xl">
-        <div className="mb-3 inline-flex items-center gap-2 rounded border border-primary/20 bg-secondary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
-          <Scale className="size-3.5" /> Pipeline comparison
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">Weak baseline vs. our full pipeline.</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Same fetched page, two pipelines. <strong className="text-foreground">Weak</strong> ranks with the plain
-          heuristic and sends the raw, uncompressed page to Claude. <strong className="text-foreground">Better</strong>{" "}
-          compresses that same call with TTC, builds our domain-specific evidence capsule, and — when enough Terac
-          labels exist — ranks with a freshly-fit candidate model instead of the heuristic. Every number below is a
-          real call, including the actual Anthropic-billed input/output tokens for each side.
-        </p>
-      </section>
+      <ComicPageHeader
+        title="Pipeline Showdown!"
+        subtitle="Weak baseline vs. Captain Ddoski's full pipeline — same page, two scorers, real tokens."
+        pose="research"
+        bg="var(--comic-purple)"
+        light
+      />
+      <p className="mb-8 max-w-3xl text-sm leading-6 text-muted-foreground">
+        Same fetched page, two pipelines. <strong className="text-foreground">Weak</strong> ranks with the plain
+        heuristic and sends the raw, uncompressed page to Claude. <strong className="text-foreground">Better</strong>{" "}
+        compresses that same call with TTC, builds our domain-specific evidence capsule, and — when enough Terac
+        labels exist — ranks with a freshly-fit candidate model instead of the heuristic. Every number below is a
+        real call, including the actual Anthropic-billed input/output tokens for each side.
+      </p>
 
       <Card className="glass-panel">
         <CardContent className="pt-5">

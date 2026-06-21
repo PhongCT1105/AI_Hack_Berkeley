@@ -1,4 +1,4 @@
-"""Schemas for the Captain America demo pipeline (mocked-first build).
+"""Schemas for the Captain Ddoski demo pipeline (mocked-first build).
 
 UI-ONLY THIS BUILD: /api/demo-results and /api/demo-run return deterministic,
 synthetic data classified from `app/data/finance_domains.py` rather than running

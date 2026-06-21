@@ -77,17 +77,17 @@ async def stream_workflow(pipeline: Pipeline, history, prompt: str, max_sources:
     for coro in asyncio.as_completed([bounded_score(u) for u in discovery.urls]):
         url, resp, error, steps = await coro
         yield _event("narrative", text=f"Scoring candidate source: {url}")
-        yield _event("tool_call", tool="captain_america_score_source", input={"url": url, "task": prompt})
+        yield _event("tool_call", tool="captain_ddoski_score_source", input={"url": url, "task": prompt})
         for step in steps:
             yield step
         if resp is None:
-            yield _event("tool_result", tool="captain_america_score_source", output={"url": url, "error": error})
+            yield _event("tool_result", tool="captain_ddoski_score_source", output={"url": url, "error": error})
             continue
 
         scored.append(resp)
         yield _event(
             "tool_result",
-            tool="captain_america_score_source",
+            tool="captain_ddoski_score_source",
             output={
                 "url": resp.url,
                 "domain": resp.domain,

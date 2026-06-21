@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronRight, Loader2, ShieldCheck, ShieldX, Sparkles } from "lucide-react";
+import { ChevronRight, Loader2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ComicPageHeader } from "@/components/comic/comic-page-header";
+import { MascotAvatar } from "@/components/comic/mascot-avatar";
 import { NarrativeBlock, ToolCallBlock, ToolResultBlock, Typewriter } from "@/components/workflow-transcript";
 import { scoreColor } from "@/lib/score-ui";
 import type { ResearchResponse, ScoreResponse, WorkflowEvent } from "@/lib/types";
@@ -64,17 +66,11 @@ export default function DemoPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 sm:py-10">
-      <section className="mb-8 max-w-2xl">
-        <div className="mb-3 inline-flex items-center gap-2 rounded border border-primary/20 bg-secondary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
-          <ShieldCheck className="size-3.5" /> Research Shield
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">Ask one question. Watch the agent work.</h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Every step below is a real call — Claude plans the search, Firecrawl finds live sources, the
-          credibility engine scores each one, and Terac gets queued the moment a source misses the trust
-          threshold. Nothing here is scripted.
-        </p>
-      </section>
+      <ComicPageHeader
+        title="Run Shield!"
+        subtitle="Ask one question. Watch Captain Ddoski work — every step below is a real call."
+        pose="point"
+      />
 
       <Card className="glass-panel">
         <CardContent className="pt-5">
@@ -163,13 +159,13 @@ export default function DemoPage() {
           <div className="grid gap-5 lg:grid-cols-2">
             <SourceGroup
               title="Validated evidence"
-              icon={ShieldCheck}
+              pose="goodLike"
               sources={result.cited_sources}
               empty="No sources met the citation threshold."
             />
             <SourceGroup
               title="Rejected sources"
-              icon={ShieldX}
+              pose="warningStop"
               sources={result.rejected_sources}
               rejected
               empty="No sources were rejected in this run."
@@ -196,13 +192,13 @@ function EventBlock({ event }: { event: WorkflowEvent }) {
 
 function SourceGroup({
   title,
-  icon: Icon,
+  pose,
   sources,
   rejected,
   empty,
 }: {
   title: string;
-  icon: typeof ShieldCheck;
+  pose: "goodLike" | "warningStop";
   sources: ScoreResponse[];
   rejected?: boolean;
   empty: string;
@@ -211,7 +207,7 @@ function SourceGroup({
     <Card>
       <CardContent className="pt-5">
         <h2 className={`flex items-center gap-2 text-base font-bold ${rejected ? "text-destructive" : ""}`}>
-          <Icon className="size-4" /> {title}
+          <MascotAvatar pose={pose} size="xs" /> {title}
         </h2>
         <div className="mt-3 space-y-2">
           {sources.length ? (

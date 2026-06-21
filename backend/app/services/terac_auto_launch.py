@@ -38,7 +38,7 @@ from app.services.supabase_writer import insert_task_row
 if TYPE_CHECKING:
     from app.services.pipeline import Pipeline
 
-logger = logging.getLogger("captain_america.terac_auto_launch")
+logger = logging.getLogger("captain_ddoski.terac_auto_launch")
 
 # Matches the research_task wording already used across the 200 existing
 # labeled rows in Supabase (see data/supabase_labeled_tasks.jsonl) so new
@@ -85,7 +85,7 @@ async def evaluate(pipeline: "Pipeline", response: ScoreResponse) -> dict | None
             return {"skipped": True, "reason": reason}
 
         tracer = get_tracer()
-        with tracer.start_as_current_span("captain_america.terac_auto_launch.run") as span:
+        with tracer.start_as_current_span("captain_ddoski.terac_auto_launch.run") as span:
             span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.CHAIN.value)
             span.set_attribute("auto_launch.domain", response.domain)
             span.set_attribute("auto_launch.original_url", response.url)

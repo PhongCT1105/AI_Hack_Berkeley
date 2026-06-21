@@ -1,10 +1,12 @@
 "use client";
 
-import { AlertTriangle, Ban, Radar, ShieldAlert } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, Ban } from "lucide-react";
+import { ComicBadge, toneForRiskTag } from "@/components/comic/comic-badge";
+import { ComicBurst } from "@/components/comic/comic-burst";
+import { ComicPanel, ComicPanelHeader } from "@/components/comic/comic-panel";
+import { ComicPageHeader } from "@/components/comic/comic-page-header";
+import { MascotAvatar } from "@/components/comic/mascot-avatar";
 import { useResults } from "@/lib/api";
-import { scoreColor, scoreHex } from "@/lib/score-ui";
 import type { ScoreResponse } from "@/lib/types";
 
 const FINANCE_BLOCKLIST: { domain: string; reputation: number }[] = [
@@ -144,6 +146,13 @@ function topRiskTags(results: ScoreResponse[]) {
     .slice(0, 5);
 }
 
+function toneForScore(score: number | null): "red" | "orange" | "yellow" {
+  if (score === null) return "red";
+  if (score <= 20) return "red";
+  if (score <= 45) return "orange";
+  return "yellow";
+}
+
 export default function ThreatFeedPage() {
   const results = useResults();
   const flagged = results.filter((result) => result.recommendation === "AVOID");
@@ -152,185 +161,144 @@ export default function ThreatFeedPage() {
   const maxTagCount = Math.max(...commonTags.map((item) => item.count), 1);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
-      <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-foreground">
-            <Radar className="size-5 text-primary" />
-            Threat Feed
-          </h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Session monitor for finance sources Captain America recommends agents avoid.
-          </p>
-        </div>
-        <Badge tone={flagged.length > 0 ? "danger" : "success"}>
-          {flagged.length} flagged source{flagged.length === 1 ? "" : "s"}
-        </Badge>
-      </div>
+    <div className="comic-zone min-h-[calc(100vh-3.5rem)] px-6 py-10">
+      <div className="mx-auto max-w-7xl">
+        <ComicPageHeader
+          title="Threat Feed!"
+          subtitle="Captain Ddoski's session monitor for finance sources agents should AVOID."
+          pose="warningStop"
+          right={
+            <>
+              <ComicBurst value={flagged.length} tone={flagged.length > 0 ? "red" : "green"} size="lg" />
+              <span className="font-comic text-sm text-(--comic-ink)">
+                flagged
+                <br />
+                source{flagged.length === 1 ? "" : "s"}
+              </span>
+            </>
+          }
+        />
 
-      {flagged.length === 0 ? (
-        <Card className="glass-panel">
-          <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
-            <span className="flex size-12 items-center justify-center rounded-full bg-secondary">
-              <ShieldAlert className="size-5 text-primary" />
-            </span>
-            <p className="text-sm font-medium text-foreground">No flagged sources yet</p>
+        {flagged.length === 0 ? (
+          <ComicPanel className="flex flex-col items-center gap-3 py-16 text-center">
+            <MascotAvatar pose="goodLike" size="xl" />
+            <p className="font-comic text-xl text-(--comic-ink)">All clear, citizen!</p>
             <p className="max-w-md text-xs text-muted-foreground">
               Sources marked AVOID will appear here as grouped domain threats after analysis.
             </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-6">
-          <Card className="overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border bg-muted px-5 py-3">
-              <span className="text-sm font-semibold text-foreground">Flagged Domains</span>
-              <span className="text-xs text-muted-foreground">
-                {threats.length} domain{threats.length === 1 ? "" : "s"}
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left text-xs font-semibold tracking-wide text-muted-foreground">
-                    <th className="px-5 py-3">Domain</th>
-                    <th className="px-5 py-3">Risk tags</th>
-                    <th className="px-5 py-3">Trust score</th>
-                    <th className="px-5 py-3">Times seen</th>
-                    <th className="px-5 py-3">First seen</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {threats.map((threat) => (
-                    <tr key={threat.domain} className="transition-colors hover:bg-secondary/30">
-                      <td className="px-5 py-3.5">
-                        <div className="font-medium text-foreground">{threat.domain}</div>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex max-w-lg flex-wrap gap-1">
-                          {threat.riskTags.length === 0 ? (
-                            <span className="text-xs text-muted-foreground/60">—</span>
-                          ) : (
-                            threat.riskTags.slice(0, 4).map((tag) => (
-                              <Badge key={tag} tone="danger">
-                                {tag}
-                              </Badge>
-                            ))
-                          )}
+          </ComicPanel>
+        ) : (
+          <div className="grid gap-8">
+            <div>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="font-comic text-2xl text-(--comic-ink)">Flagged Domains</h2>
+                <span className="comic-pop bg-white px-2.5 py-1 text-[11px] text-(--comic-ink)">
+                  {threats.length} domain{threats.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {threats.map((threat, i) => (
+                  <ComicPanel
+                    key={threat.domain}
+                    tilt={i % 2 === 0}
+                    className="flex flex-col gap-3 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate font-comic text-lg text-(--comic-ink)">
+                          {threat.domain}
                         </div>
-                      </td>
-                      <td className="px-5 py-3.5">
-                        {threat.trustScore === null ? (
-                          <span className="text-xs text-muted-foreground/60">—</span>
-                        ) : (
-                          <div className="flex items-center gap-2.5">
-                            <span
-                              className={`text-xl font-bold tabular-nums leading-none ${scoreColor(
-                                threat.trustScore,
-                              )}`}
-                            >
-                              {threat.trustScore}
-                            </span>
-                            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
+                        <div className="text-[11px] font-semibold text-muted-foreground">
+                          seen {threat.timesSeen}x &middot; first {formatFirstSeen(threat.firstSeen)}
+                        </div>
+                      </div>
+                      <ComicBurst
+                        value={threat.trustScore ?? "—"}
+                        tone={toneForScore(threat.trustScore)}
+                        size="sm"
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {threat.riskTags.length === 0 ? (
+                        <span className="text-xs text-muted-foreground/60">No risk tags</span>
+                      ) : (
+                        threat.riskTags.slice(0, 4).map((tag) => (
+                          <ComicBadge key={tag} tone={toneForRiskTag(tag)}>
+                            {tag}
+                          </ComicBadge>
+                        ))
+                      )}
+                    </div>
+                  </ComicPanel>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+              <ComicPanel>
+                <ComicPanelHeader color="var(--comic-blue)">
+                  <span className="flex items-center gap-2 font-comic text-lg text-white">
+                    <AlertTriangle className="size-4" />
+                    Common patterns
+                  </span>
+                </ComicPanelHeader>
+                <div className="p-5">
+                  {commonTags.length === 0 ? (
+                    <p className="rounded border-2 border-(--comic-ink) bg-(--comic-yellow)/30 px-3 py-6 text-center text-sm font-semibold text-(--comic-ink)">
+                      No risk tags were attached to flagged sources.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {commonTags.map((item) => {
+                        const percent = Math.round((item.count / flagged.length) * 100);
+                        const width = `${Math.max(6, (item.count / maxTagCount) * 100)}%`;
+                        const tone = toneForRiskTag(item.tag);
+
+                        return (
+                          <div key={item.tag}>
+                            <div className="mb-1.5 flex items-center justify-between gap-3">
+                              <span className="font-comic text-sm text-(--comic-ink)">{item.tag}</span>
+                              <span className="text-xs font-semibold text-muted-foreground">
+                                {percent}% of flagged sources
+                              </span>
+                            </div>
+                            <div className="h-3 overflow-hidden rounded-full border-2 border-(--comic-ink) bg-white">
                               <div
-                                className="h-full rounded-full"
-                                style={{
-                                  width: `${threat.trustScore}%`,
-                                  backgroundColor: scoreHex(threat.trustScore),
-                                }}
+                                className="h-full"
+                                style={{ width, backgroundColor: `var(--comic-${tone})` }}
                               />
                             </div>
                           </div>
-                        )}
-                      </td>
-                      <td className="px-5 py-3.5 font-medium tabular-nums text-foreground">
-                        {threat.timesSeen}
-                      </td>
-                      <td className="px-5 py-3.5 text-muted-foreground">
-                        {formatFirstSeen(threat.firstSeen)}
-                      </td>
-                    </tr>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </ComicPanel>
+
+              <ComicPanel>
+                <ComicPanelHeader color="var(--comic-red)">
+                  <span className="flex items-center gap-2 font-comic text-lg text-white">
+                    <Ban className="size-4" />
+                    Finance blocklist domains
+                  </span>
+                </ComicPanelHeader>
+                <ul className="divide-y-2 divide-(--comic-ink)/10">
+                  {FINANCE_BLOCKLIST.map((item) => (
+                    <li
+                      key={item.domain}
+                      className="flex items-center justify-between gap-3 px-5 py-3.5"
+                    >
+                      <span className="font-semibold text-(--comic-ink)">{item.domain}</span>
+                      <ComicBadge tone="red">{Math.round(item.reputation * 100)}%</ComicBadge>
+                    </li>
                   ))}
-                </tbody>
-              </table>
+                </ul>
+              </ComicPanel>
             </div>
-          </Card>
-
-          <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-foreground">
-                  <AlertTriangle className="size-4 text-red-500" />
-                  Common patterns
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {commonTags.length === 0 ? (
-                  <p className="rounded border border-border bg-muted px-3 py-6 text-center text-sm text-muted-foreground">
-                    No risk tags were attached to flagged sources.
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {commonTags.map((item) => {
-                      const percent = Math.round((item.count / flagged.length) * 100);
-                      const width = `${Math.max(6, (item.count / maxTagCount) * 100)}%`;
-
-                      return (
-                        <div key={item.tag}>
-                          <div className="mb-1.5 flex items-center justify-between gap-3">
-                            <span className="text-sm font-medium text-foreground">{item.tag}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {percent}% of flagged sources
-                            </span>
-                          </div>
-                          <div className="h-2.5 overflow-hidden rounded-full bg-muted">
-                            <div
-                              className="h-full rounded-full bg-linear-to-r from-red-500 to-primary"
-                              style={{ width }}
-                            />
-                          </div>
-                          <p className="mt-1 text-xs text-muted-foreground/70">
-                            {item.tag}: {percent}% of flagged sources
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="overflow-hidden">
-              <CardHeader className="bg-muted">
-                <CardTitle className="flex items-center gap-2 text-foreground">
-                  <Ban className="size-4 text-red-500" />
-                  Finance blocklist domains
-                </CardTitle>
-              </CardHeader>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-left text-xs font-semibold tracking-wide text-muted-foreground">
-                      <th className="px-5 py-3">Domain</th>
-                      <th className="px-5 py-3">Prior</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/60">
-                    {FINANCE_BLOCKLIST.map((item) => (
-                      <tr key={item.domain}>
-                        <td className="px-5 py-3.5 font-medium text-foreground">{item.domain}</td>
-                        <td className="px-5 py-3.5 text-red-600 tabular-nums">
-                          {Math.round(item.reputation * 100)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -21,7 +21,7 @@ from openinference.semconv.trace import OpenInferenceSpanKindValues, SpanAttribu
 from app.core.config import settings
 from app.core.observability import get_tracer
 
-logger = logging.getLogger("captain_america.terac_client")
+logger = logging.getLogger("captain_ddoski.terac_client")
 
 
 def push_pair(pair: dict) -> bool:
@@ -32,7 +32,7 @@ def push_pair(pair: dict) -> bool:
     is visible in Arize next to the pair/build spans that produced it.
     """
     tracer = get_tracer()
-    with tracer.start_as_current_span("captain_america.terac.push_pair") as span:
+    with tracer.start_as_current_span("captain_ddoski.terac.push_pair") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)
         span.set_attribute("terac.pair_id", pair.get("pair_id", ""))
         span.set_attribute("terac.configured", bool(settings.has_terac and settings.terac_api_url))

@@ -18,7 +18,7 @@ from app.core.config import settings
 from app.services.collector import CollectResult
 from app.services.llm_clients import create_anthropic_client, get_compression_stats, record_compression_stats
 
-logger = logging.getLogger("captain_america.extractor")
+logger = logging.getLogger("captain_ddoski.extractor")
 
 _CLICKBAIT_WORDS = (
     "shocking", "secret", "guaranteed", "you won't believe", "miracle", "exposed",
@@ -65,7 +65,7 @@ class Extractor:
         title = collected.title or ""
 
         system = (
-            "You are Captain America's source-analysis engine for FINANCE sources only. "
+            "You are Captain Ddoski's source-analysis engine for FINANCE sources only. "
             "Extract factual/financial claims and assess whether each is supported by "
             "evidence ON THE PAGE (citations, data, named sources). Also detect authorship, "
             "citation presence, publish date, and clickbait. Be skeptical and precise."

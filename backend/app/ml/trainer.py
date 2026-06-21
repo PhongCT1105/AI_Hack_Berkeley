@@ -23,7 +23,7 @@ from app.core.config import settings
 from app.core.observability import get_tracer
 from app.ml import model_registry, terac_store
 
-logger = logging.getLogger("captain_america.trainer")
+logger = logging.getLogger("captain_ddoski.trainer")
 
 MIN_LABELS = 20
 HOLDOUT_FRACTION = 0.2
@@ -68,7 +68,7 @@ def train() -> dict:
     heuristic) needs to be auditable in Arize, not just in the log line.
     """
     tracer = get_tracer()
-    with tracer.start_as_current_span("captain_america.trainer.train") as span:
+    with tracer.start_as_current_span("captain_ddoski.trainer.train") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.EVALUATOR.value)
         result = _train()
         span.set_attribute("trainer.trained", bool(result.get("trained")))

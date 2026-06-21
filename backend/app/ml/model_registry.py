@@ -15,7 +15,7 @@ import os
 from app.core.config import settings
 from app.schemas.score import SourceFeatures
 
-logger = logging.getLogger("captain_america.model_registry")
+logger = logging.getLogger("captain_ddoski.model_registry")
 
 # Order of the numeric feature vector fed to the logistic model. Keep in sync
 # with app/ml/trainer.py when wiring the real training.

@@ -7,6 +7,8 @@ import {
   CirclePause,
   Download,
 } from "lucide-react";
+import { ComicBadge } from "@/components/comic/comic-badge";
+import { ComicPageHeader } from "@/components/comic/comic-page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { useResults } from "@/lib/api";
 import type { Recommendation, ScoreResponse } from "@/lib/types";
@@ -57,13 +59,58 @@ export default function MonitorPage() {
   const reasonTotal = Math.max(reasonCounts.reduce((sum, item) => sum + item.count, 0), 1);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
-      <section className="mb-9 max-w-2xl">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Monitor</h1>
-        <p className="mt-1.5 text-sm leading-6 text-muted-foreground sm:text-base">
-          Observe source checks, blocked citations, and model behavior in real time. System performance is currently <strong className="font-semibold text-primary">stable</strong>.
-        </p>
+    <div>
+      <section className="comic-zone border-b-[3px] border-(--comic-ink) px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-2">
+          <div>
+            <span className="comic-pop mb-4 bg-(--comic-yellow) px-3 py-1.5 text-[11px] text-(--comic-ink)">
+              Source trust infrastructure for AI agents
+            </span>
+            <h1 className="font-comic text-5xl leading-[1.05] text-(--comic-ink) sm:text-6xl">
+              Captain Ddoski
+            </h1>
+            <p className="mt-3 max-w-md text-base leading-7 font-semibold text-(--comic-ink)/80">
+              Validates every finance source before an agent cites it &mdash; scoring credibility,
+              blocking the junk, and keeping a live trail of receipts.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                href="/demo"
+                className="comic-pop bg-(--comic-red) px-5 py-3 text-sm text-white"
+              >
+                Run Shield <ArrowRight className="ml-1.5 inline size-4" />
+              </Link>
+              <Link
+                href="/threats"
+                className="comic-pop bg-white px-5 py-3 text-sm text-(--comic-ink)"
+              >
+                Review Threat Feed
+              </Link>
+            </div>
+          </div>
+          <div className="comic-panel comic-panel-tilt overflow-hidden">
+            <video
+              className="aspect-video w-full object-cover"
+              src="/Captain_Ddoski_video.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              controls
+            />
+          </div>
+        </div>
       </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10">
+        <ComicPageHeader
+          title="Live Monitor"
+          subtitle="Observe source checks, blocked citations, and model behavior in real time."
+          pose="protect"
+          bg="var(--comic-blue)"
+          light
+          right={<ComicBadge tone="green">System stable</ComicBadge>}
+        />
 
       <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Metric label="Sources checked" value={results.length || "1,284"} detail="↑ 12%" />
@@ -144,7 +191,7 @@ export default function MonitorPage() {
           </Card>
         </aside>
       </section>
-
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-# Captain America
+# Captain Ddoski
 
 **Credibility infrastructure for AI agents — finance domain.** A calling agent sends a single
-`{url, task}` and Captain America returns a **trust score (0–100)**, a **USE / CAUTION / AVOID**
+`{url, task}` and Captain Ddoski returns a **trust score (0–100)**, a **USE / CAUTION / AVOID**
 recommendation, **risk tags**, per-dimension **verdicts**, extracted **claims + evidence**, and a
 compressed **Credibility Capsule** (reduces 800–1500 tokens of source context to a compact packet).
 Exposed as a FastAPI endpoint *and* a FastMCP tool, so any MCP-capable agent can call it.
@@ -19,7 +19,7 @@ Exposed as a FastAPI endpoint *and* a FastMCP tool, so any MCP-capable agent can
   - Extractor: **Claude** (Anthropic SDK) → heuristic fallback. Capsule: domain-specific
     **FinanceCredibilityCompressor** → extractive fallback.
   - Ranker: transparent **heuristic** baseline (per-feature contributions + verdicts).
-- **MCP server** (`backend/mcp_server.py`): FastMCP stdio tool `captain_america_score_source`.
+- **MCP server** (`backend/mcp_server.py`): FastMCP stdio tool `captain_ddoski_score_source`.
 - **Frontend** (`frontend/src/app/`): dark observability-console UI —
   **Dashboard** (`/`), **Research** (`/demo`), **Evaluation** (`/eval`), and **Threat Feed**
   (`/threats`).
@@ -71,7 +71,7 @@ uvicorn app.main:app --reload --port 8000
 cd frontend && cp .env.local.example .env.local && npm run dev
 
 # MCP tool (optional) — engine must be running
-cd backend && python mcp_server.py          # or: claude mcp add captain-america -- python $(pwd)/mcp_server.py
+cd backend && python mcp_server.py          # or: claude mcp add captain-ddoski -- python $(pwd)/mcp_server.py
 ```
 
 `curl localhost:8000/api/health` reports which integrations are live, including
@@ -94,7 +94,7 @@ Run a live research request after setting `FIRECRAWL_API_KEY`:
 ```bash
 curl -X POST http://localhost:8000/api/research \
   -H 'Content-Type: application/json' \
-  -H 'X-Captain-America-Caller: local-smoke-test' \
+  -H 'X-Captain-Ddoski-Caller: local-smoke-test' \
   -d '{"prompt":"For a source-trust showcase, compare Nvidia’s latest earnings and investment outlook using its investor-relations materials, SEC filings, or Reuters reporting. Contrast them with promotional, anonymous, or guaranteed-return stock-pick claims. Cite only validated evidence and clearly reject weak sources.","max_sources":20}'
 ```
 
@@ -108,7 +108,7 @@ the next implementation gates.
 
 ## Claude MCP demo
 
-Captain America is registered as a local stdio MCP server named `captain-america`.
+Captain Ddoski is registered as a local stdio MCP server named `captain-ddoski`.
 
 ```bash
 # 1. Start the scoring engine.
@@ -116,7 +116,7 @@ cd backend
 DEBUG=true .venv/bin/python -m uvicorn app.main:app --port 8000
 
 # 2. Register the MCP server with Claude Code.
-claude mcp add captain-america -- \
+claude mcp add captain-ddoski -- \
   /absolute/path/to/backend/.venv/bin/python \
   /absolute/path/to/backend/mcp_server.py
 
@@ -124,14 +124,14 @@ claude mcp add captain-america -- \
 claude mcp list
 
 # 4. Run a deterministic test prompt.
-claude -p "Use Captain America MCP to score https://best-stock-picks-now.com/double-your-money for this task: Research low-risk retirement investments. Return recommendation, score, and risk tags." \
-  --allowedTools mcp__captain_america__captain_america_score_source
+claude -p "Use Captain Ddoski MCP to score https://best-stock-picks-now.com/double-your-money for this task: Research low-risk retirement investments. Return recommendation, score, and risk tags." \
+  --allowedTools mcp__captain_ddoski__captain_ddoski_score_source
 ```
 
 The backend terminal logs Claude-originated calls like:
 
 ```text
-[Captain America] score_source caller=claude-mcp url=https://best-stock-picks-now.com/double-your-money task=Research low-risk retirement investments
+[Captain Ddoski] score_source caller=claude-mcp url=https://best-stock-picks-now.com/double-your-money task=Research low-risk retirement investments
 ```
 
 The backend also records those calls in `GET /api/results` and grouped flagged domains in
@@ -183,7 +183,7 @@ npm run dev
 
 ## Token Company challenge
 
-AgentShield includes a finance-focused compression demo for The Token Company challenge.
+Captain Ddoski includes a finance-focused compression demo for The Token Company challenge.
 It turns long crawled source context into compact credibility capsules for finance AI agents,
 preserving source URL, author, citations, dates, claims, risk tags, numbers, and institutions.
 
@@ -203,7 +203,7 @@ cd backend
 .venv/bin/python scripts/eval_ttc_compression.py
 ```
 
-Each run compares three variants: the raw prompt, the AgentShield credibility
+Each run compares three variants: the raw prompt, the Captain Ddoski credibility
 capsule, and The Token Company Bear-2 compression. It saves every input, Claude
 output, real input token count, and quality metric to
 `backend/data/compression_evaluations/`. The latest run is also available from

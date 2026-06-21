@@ -13,7 +13,7 @@ from app.schemas.score import ScoreRequest, ScoreResponse
 from app.services import monitor
 
 router = APIRouter(prefix="/api", tags=["score"])
-logger = logging.getLogger("captain_america.api.score")
+logger = logging.getLogger("captain_ddoski.api.score")
 
 _call_count = 0
 _call_count_lock = threading.Lock()
@@ -37,16 +37,10 @@ async def _run_monitor_check(pipeline, history) -> None:
 @router.post("/score-source", response_model=ScoreResponse)
 async def score_source(req: ScoreRequest, request: Request, background_tasks: BackgroundTasks) -> ScoreResponse:
     pipeline = request.app.state.pipeline
-    # Keep the old header during the brand migration so existing integrations
-    # retain their source history. New callers should use X-Captain-America-Caller.
-    caller = (
-        request.headers.get("x-captain-america-caller")
-        or request.headers.get("x-agentshield-caller")
-        or "api"
-    )
+    caller = request.headers.get("x-captain-ddoski-caller") or "api"
     logger.info("score_source caller=%s url=%s task=%s", caller, req.url, req.task)
     print(
-        f"[Captain America] score_source caller={caller} url={req.url} task={req.task}",
+        f"[Captain Ddoski] score_source caller={caller} url={req.url} task={req.task}",
         file=sys.stderr,
         flush=True,
     )

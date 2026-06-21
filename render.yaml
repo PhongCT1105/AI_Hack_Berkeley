@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: agentshield-mcp
+    name: captain_ddoski-mcp
     env: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt

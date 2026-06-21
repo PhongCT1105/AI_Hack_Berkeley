@@ -1,8 +1,8 @@
-# AgentShield: agent knowledge base
+# Captain Ddoski: agent knowledge base
 
 ## Purpose and boundary
 
-AgentShield is credibility infrastructure for AI agents. Before an agent scrapes, cites, or reasons from a web page, it calls AgentShield with a URL and a task. The service returns a recommendation, trust score, compact evidence, and risk signals.
+Captain Ddoski is credibility infrastructure for AI agents. Before an agent scrapes, cites, or reasons from a web page, it calls Captain Ddoski with a URL and a task. The service returns a recommendation, trust score, compact evidence, and risk signals.
 
 This is not a generic fake-news detector. It helps a downstream agent decide whether a specific page is suitable for a specific task. A source can be credible in one context and inappropriate in another.
 
@@ -131,10 +131,10 @@ Only state that an integration is present if it is actually configured and shown
 
 ## Demo and delivery rules
 
-Start with contrast: a research agent would cite a weak page; with AgentShield, it receives a source decision and evidence capsule first. Then show the trace, capsule/token reduction, annotation arena, before/after evaluation, and reliability evidence.
+Start with contrast: a research agent would cite a weak page; with Captain Ddoski, it receives a source decision and evidence capsule first. Then show the trace, capsule/token reduction, annotation arena, before/after evaluation, and reliability evidence.
 
 By hour 6, the vertical slice must work. If it does not, cut scope rather than adding integrations. Before judging, run 10 fixed demo cases, test on the deployment, retain a local fixture flow, and record a backup walkthrough.
 
 ## Source materials
 
-This working brief consolidates the supplied AgentShield playbook, Terac guide, hacker guide, Sentry starter pack, and Token Company brief. The original files remain in Downloads; this repository does not copy them, so this document is the project-local reference.
+This working brief consolidates the supplied Captain Ddoski playbook, Terac guide, hacker guide, Sentry starter pack, and Token Company brief. The original files remain in Downloads; this repository does not copy them, so this document is the project-local reference.

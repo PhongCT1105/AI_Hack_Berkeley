@@ -1,4 +1,4 @@
-# Captain America Finance: Supabase and deployment handoff
+# Captain Ddoski Finance: Supabase and deployment handoff
 
 ## Annotation flow (current)
 
@@ -52,7 +52,7 @@ If Hugging Face is unavailable, download an official Fin-Fact export and run:
 
     python3 scripts/prepare_finfact_for_terac.py --input /path/to/finfact.jsonl --limit 200
 
-This generates `data/captain_america_terac_tasks.jsonl` and `.csv` for public
+This generates `data/captain_ddoski_terac_tasks.jsonl` and `.csv` for public
 annotation plus `hidden_original_labels.csv` for admin-only sanity checks.
 Never upload, display, or train on the hidden-label file.
 
@@ -90,7 +90,7 @@ clears any labels collected against the old tasks:
    (Pass the password via header, not a query string — it may contain `+`/`/`
    characters that need URL-encoding in a query param.)
 
-Target Terac setup: Captain America Finance Claim Credibility Labeling; general
+Target Terac setup: Captain Ddoski Finance Claim Credibility Labeling; general
 population; 20-45 seconds per item; three labels per task
 (`TARGET_LABELS_PER_TASK`). Only labels in `simple_claim_annotations` belong
 in the Terac-track training story (`claim` + `evidence_text_clean` ->

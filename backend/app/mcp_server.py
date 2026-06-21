@@ -1,4 +1,4 @@
-"""HTTP MCP server for AgentShield compression tools."""
+"""HTTP MCP server for Captain Ddoski compression tools."""
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -15,7 +15,7 @@ from app.services.semantic_ir_compressor import SemanticIRCompressor
 CompressionMethod = Literal["semantic_ir", "sentence_selector"]
 
 mcp = FastMCP(
-    name="agentshield",
+    name="captain_ddoski",
     instructions=(
         "Tools for compressing source context into smaller evidence capsules for "
         "AI agents. Prefer semantic_ir for structured capsules and "
@@ -85,12 +85,12 @@ def compress_context(
 
 @mcp.tool(
     name="server_status",
-    description="Return basic deployment status and capability flags for AgentShield.",
+    description="Return basic deployment status and capability flags for Captain Ddoski.",
 )
 def server_status() -> dict[str, object]:
     return {
         "service": settings.app_name,
-        "mcp_server": "agentshield",
+        "mcp_server": "captain_ddoski",
         "status": "ok",
         "capabilities": {
             "anthropic": settings.has_anthropic,
@@ -101,13 +101,13 @@ def server_status() -> dict[str, object]:
 
 
 mcp_app = mcp.http_app(path="/", transport="streamable-http")
-app = FastAPI(title="AgentShield MCP", debug=settings.debug, lifespan=mcp_app.lifespan)
+app = FastAPI(title="Captain Ddoski MCP", debug=settings.debug, lifespan=mcp_app.lifespan)
 app.mount("/mcp", mcp_app)
 
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"service": "AgentShield MCP", "status": "ok"}
+    return {"service": "Captain Ddoski MCP", "status": "ok"}
 
 
 @app.get("/api/health")

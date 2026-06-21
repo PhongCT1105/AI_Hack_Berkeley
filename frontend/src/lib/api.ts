@@ -1,4 +1,4 @@
-// API client for the Captain America FastAPI engine + a tiny sessionStorage result
+// API client for the Captain Ddoski FastAPI engine + a tiny sessionStorage result
 // store so the Source Detail screen can read a result by trace_id without refetch.
 
 import { useEffect, useSyncExternalStore } from "react";
@@ -42,7 +42,7 @@ export async function scoreSource(url: string, task: string): Promise<ScoreRespo
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Captain-America-Caller": "dashboard",
+      "X-Captain-Ddoski-Caller": "dashboard",
     },
     body: JSON.stringify({ url, task }),
   });
@@ -88,14 +88,14 @@ export async function getEvalMetrics(): Promise<EvalMetrics> {
 export async function runResearch(prompt: string, maxSources = 20): Promise<ResearchResponse> {
   const response = await fetch(`${API_URL}/api/research`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Captain-America-Caller": "research-demo" },
+    headers: { "Content-Type": "application/json", "X-Captain-Ddoski-Caller": "research-demo" },
     body: JSON.stringify({ prompt, max_sources: maxSources }),
   });
   return json<ResearchResponse>(response);
 }
 
 // --- session result store (client-only, via useSyncExternalStore) -------- //
-const STORE_KEY = "captain-america:results";
+const STORE_KEY = "captain-ddoski:results";
 const EMPTY: ScoreResponse[] = [];
 const listeners = new Set<() => void>();
 let cache: ScoreResponse[] | null = null;

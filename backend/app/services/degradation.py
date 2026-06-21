@@ -1,6 +1,6 @@
 """Degradation detector — the piece Arize AX itself doesn't provide.
 
-Arize gives us traces with `captain_america.trust_score` / `ranker.confidence`
+Arize gives us traces with `captain_ddoski.trust_score` / `ranker.confidence`
 on every call (see pipeline.py); this module is what actually decides "source
 quality or model confidence degraded" by comparing a recent window of
 ScoreHistory against an older baseline window, per domain.

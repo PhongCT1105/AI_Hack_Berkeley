@@ -20,7 +20,7 @@ async def build_pair(
     auto_queued_reason: str | None = None,
 ) -> dict:
     tracer = get_tracer()
-    with tracer.start_as_current_span("captain_america.terac.build_pair") as span:
+    with tracer.start_as_current_span("captain_ddoski.terac.build_pair") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.CHAIN.value)
         span.set_attribute("terac.task", task)
         span.set_attribute("terac.url_a", url_a)

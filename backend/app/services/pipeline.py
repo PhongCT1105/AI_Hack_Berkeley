@@ -51,7 +51,7 @@ class Pipeline:
         compression) — every production caller omits it and behavior is
         unchanged. app/services/workflow_demo.py passes one so the showcase
         transcript can show these normally-internal stages as their own
-        tool calls instead of one opaque captain_america_score_source call."""
+        tool calls instead of one opaque captain_ddoski_score_source call."""
         def emit(event: dict) -> None:
             if on_step is not None:
                 on_step(event)
@@ -71,7 +71,7 @@ class Pipeline:
             emit({"type": "tool_result", "tool": "cache_lookup", "output": {"hit": True}})
             return ScoreResponse(**cached)
 
-        with tracer.start_as_current_span("captain_america.score_source") as root:
+        with tracer.start_as_current_span("captain_ddoski.score_source") as root:
             # OpenInference span kind: this is the TOOL boundary an agent calls
             # (directly or via the MCP server) before trusting a URL — Arize
             # groups/filters on this so the whole pipeline shows up as one
@@ -79,8 +79,8 @@ class Pipeline:
             root.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)
             root.set_attribute(SpanAttributes.INPUT_VALUE, json.dumps({"url": req.url, "task": req.task}))
             root.set_attribute(SpanAttributes.INPUT_MIME_TYPE, "application/json")
-            root.set_attribute("captain_america.url", req.url)
-            root.set_attribute("captain_america.task", req.task)
+            root.set_attribute("captain_ddoski.url", req.url)
+            root.set_attribute("captain_ddoski.task", req.task)
 
             # Stage 1: collect
             emit({"type": "tool_call", "tool": "firecrawl_collect", "input": {"url": req.url}})
@@ -137,7 +137,7 @@ class Pipeline:
                 rep, listed, domain = await reputation.lookup(collected.final_url, self.cache)
                 feats: SourceFeatures = features_mod.build_features(collected, extracted, rep, listed)
 
-            root.set_attribute("captain_america.domain", domain)
+            root.set_attribute("captain_ddoski.domain", domain)
 
             # Stage 4: rank
             emit({"type": "tool_call", "tool": "credibility_ranker", "input": {"domain": domain}})
@@ -293,8 +293,8 @@ class Pipeline:
                 latency_ms=latency_ms,
                 trace_id=trace_id,
             )
-            root.set_attribute("captain_america.recommendation", recommendation.value)
-            root.set_attribute("captain_america.trust_score", trust_score)
+            root.set_attribute("captain_ddoski.recommendation", recommendation.value)
+            root.set_attribute("captain_ddoski.trust_score", trust_score)
             root.set_attribute("ranker.confidence", confidence)
             root.set_attribute(
                 SpanAttributes.OUTPUT_VALUE,

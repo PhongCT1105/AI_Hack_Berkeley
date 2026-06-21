@@ -1,4 +1,4 @@
-"""Captain America FastAPI entrypoint.
+"""Captain Ddoski FastAPI entrypoint.
 
 Credibility infrastructure for AI agents (finance domain). Boots and serves a
 valid heuristic verdict with zero API keys; every integration degrades gracefully.

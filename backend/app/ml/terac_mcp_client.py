@@ -18,7 +18,7 @@ from openinference.semconv.trace import OpenInferenceSpanKindValues, SpanAttribu
 from app.core.config import settings
 from app.core.observability import get_tracer
 
-logger = logging.getLogger("captain_america.terac_mcp_client")
+logger = logging.getLogger("captain_ddoski.terac_mcp_client")
 
 
 class TeracMCPError(RuntimeError):
@@ -36,7 +36,7 @@ async def call_tool(name: str, arguments: dict) -> dict:
         raise TeracMCPError("TERAC_API_URL / TERAC_API_KEY not configured")
 
     tracer = get_tracer()
-    with tracer.start_as_current_span(f"captain_america.terac_mcp.{name}") as span:
+    with tracer.start_as_current_span(f"captain_ddoski.terac_mcp.{name}") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)
         span.set_attribute("terac_mcp.tool", name)
         span.set_attribute(SpanAttributes.INPUT_VALUE, json.dumps(arguments, default=str))

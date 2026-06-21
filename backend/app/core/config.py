@@ -15,7 +15,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[2]
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 
-    app_name: str = "Captain America API"
+    app_name: str = "Captain Ddoski API"
     debug: bool = True
 
     @field_validator("debug", mode="before")
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     ttc_api_key: str | None = None
     ttc_compression_model: str = "bear-2"
     ttc_aggressiveness: float = Field(default=0.2, ge=0.0, le=1.0)
-    ttc_app_id: str = "captain-america"
+    ttc_app_id: str = "captain-ddoski"
 
     firecrawl_api_key: str | None = None
     firecrawl_api_url: str = "https://api.firecrawl.dev"
@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     # Phoenix, then a no-op tracer. See app/core/observability.py.
     arize_space_id: str | None = None
     arize_api_key: str | None = None
-    arize_project_name: str = "captain-america"
+    arize_project_name: str = "captain-ddoski"
 
     terac_api_key: str | None = None          # absent -> local-only stub arena
     terac_api_url: str | None = None          # Terac's MCP endpoint (https://terac.com/api/mcp), not a plain REST base
@@ -109,7 +109,7 @@ class Settings(BaseSettings):
     citation_model_min_probability: float = Field(default=0.50, ge=0.5, le=0.95)
     supabase_export_path: str = "data/supabase_labeled_tasks.jsonl"
     terac_store_path: str = "data/terac_store.json"
-    score_history_path: str = "data/captain_america_history.json"
+    score_history_path: str = "data/captain_ddoski_history.json"
     retrain_queue_path: str = "data/retrain_queue.json"
     # Throttle for the auto-monitor background check fired from /api/score-source.
     monitor_check_every_n_calls: int = 20

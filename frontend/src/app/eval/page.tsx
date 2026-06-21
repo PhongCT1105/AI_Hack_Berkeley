@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ComicPageHeader } from "@/components/comic/comic-page-header";
 import { ThreeWayCompressionEvaluation } from "@/components/compression/three-way-evaluation";
 import { getEvalMetrics } from "@/lib/api";
 import type { EvalMetrics } from "@/lib/types";
@@ -75,14 +76,12 @@ export default function EvalPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
-      {/* Header */}
-      <div className="mb-7">
-        <h1 className="flex items-center gap-2.5 text-2xl font-bold tracking-tight text-foreground">
-          <Gauge className="size-6 text-primary" />
-          Model Improvement
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Fin-Fact pretrain (no human input) vs Terac-trained model.</p>
-      </div>
+      <ComicPageHeader
+        title="Model Improvement"
+        subtitle="Fin-Fact pretrain (no human input) vs Terac-trained model."
+        pose="success"
+        bg="var(--comic-green)"
+      />
 
       {/* Summary cards */}
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
@@ -171,7 +170,7 @@ export default function EvalPage() {
         </Card>
       </div>
 
-      {/* Model comparison cards use the Captain America treatment. */}
+      {/* Model comparison cards use the Captain Ddoski treatment. */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Card className="border-t-4 border-t-muted-foreground/30 bg-muted/30">
           <CardContent className="pt-5">

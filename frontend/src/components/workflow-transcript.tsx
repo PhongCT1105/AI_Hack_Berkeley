@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bot, CheckCircle2, ChevronRight, Terminal, XCircle } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { MascotAvatar } from "@/components/comic/mascot-avatar";
 import { cn } from "@/lib/utils";
 
 /** One light color family per tool category, so the transcript reads at a
@@ -59,9 +60,7 @@ function TypewriterRun({ text, speedMs }: { text: string; speedMs: number }) {
 export function NarrativeBlock({ text }: { text: string }) {
   return (
     <div className="flex items-start gap-3 py-1.5">
-      <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-        <Bot className="size-3.5" />
-      </span>
+      <MascotAvatar pose="research" size="xs" />
       <p className="pt-0.5 text-sm leading-6 text-foreground">
         <Typewriter text={text} />
       </p>
@@ -73,9 +72,7 @@ export function ToolCallBlock({ tool, input }: { tool: string; input: Record<str
   const style = toolStyle(tool);
   return (
     <div className="flex items-start gap-3 py-1">
-      <span className={cn("mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full", style.icon)}>
-        <Terminal className="size-3.5" />
-      </span>
+      <MascotAvatar pose="point" size="xs" className="mt-0.5" />
       <div className={cn("min-w-0 flex-1 rounded border border-l-2 border-border bg-card/70 px-3 py-2", style.border)}>
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
           <ChevronRight className="size-3 text-primary" />
@@ -95,14 +92,7 @@ export function ToolResultBlock({ tool, output }: { tool: string; output: Record
   const style = toolStyle(tool);
   return (
     <div className="flex items-start gap-3 py-1">
-      <span
-        className={cn(
-          "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
-          isError ? "bg-red-100 text-red-600" : skipped ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-600",
-        )}
-      >
-        {isError ? <XCircle className="size-3.5" /> : <CheckCircle2 className="size-3.5" />}
-      </span>
+      <MascotAvatar pose={isError ? "warningStop" : skipped ? "research" : "success"} size="xs" className="mt-0.5" />
       <div className={cn("min-w-0 flex-1 rounded border border-l-2 border-border bg-card/70 px-3 py-2", style.border)}>
         <div className="flex items-center justify-between gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">

@@ -1,4 +1,4 @@
-"""Evaluate AgentShield context compression prototypes.
+"""Evaluate Captain Ddoski context compression prototypes.
 
 Run from repo root:
     backend/.venv/bin/python backend/scripts/eval_compression.py

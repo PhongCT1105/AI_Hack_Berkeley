@@ -12,9 +12,9 @@ from urllib.parse import urlparse
 from app.core.cache import Cache
 from app.data.finance_domains import classify_domain
 
-logger = logging.getLogger("captain_america.reputation")
+logger = logging.getLogger("captain_ddoski.reputation")
 
-_REDIS_KEY = "captain_america:reputation"
+_REDIS_KEY = "captain_ddoski:reputation"
 
 
 def domain_of(url: str) -> str:

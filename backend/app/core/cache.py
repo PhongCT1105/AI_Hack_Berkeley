@@ -11,7 +11,7 @@ import time
 
 from app.core.config import settings
 
-logger = logging.getLogger("captain_america.cache")
+logger = logging.getLogger("captain_ddoski.cache")
 
 
 class Cache:

@@ -16,7 +16,7 @@ from app.services import degradation
 from app.services.pairing import build_pair
 from app.services.pipeline import Pipeline
 
-logger = logging.getLogger("captain_america.monitor")
+logger = logging.getLogger("captain_ddoski.monitor")
 
 # Same trusted reference source used elsewhere in the demo (mcp_server.py,
 # api/demo.py) — the known-good anchor an auto-queued pair compares against.
@@ -25,7 +25,7 @@ TRUSTED_BASELINE_URL = "https://www.sec.gov/investor/pubs/assetallocation.htm"
 
 async def run_check(pipeline: Pipeline, history) -> dict:
     tracer = get_tracer()
-    with tracer.start_as_current_span("captain_america.monitor.run") as span:
+    with tracer.start_as_current_span("captain_ddoski.monitor.run") as span:
         reports = degradation.scan_all_domains(history)
         flagged = [r for r in reports if r.triggered]
 

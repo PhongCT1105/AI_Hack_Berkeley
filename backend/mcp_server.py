@@ -1,4 +1,4 @@
-"""Captain America MCP server (FastMCP, stdio).
+"""Captain Ddoski MCP server (FastMCP, stdio).
 
 Exposes the credibility engine as a single MCP tool so any MCP-capable agent
 (Claude Code, Cursor, a FetchAI uAgent bridge) can validate a source. The tool
@@ -6,10 +6,10 @@ is a thin client over the FastAPI engine, keeping the pipeline (cache,
 observability, scoring) as the single source of truth.
 
 Run:   python mcp_server.py
-Register (Claude Code):  claude mcp add captain-america -- python /abs/path/backend/mcp_server.py
+Register (Claude Code):  claude mcp add captain-ddoski -- python /abs/path/backend/mcp_server.py
 Requires the FastAPI engine running:  uvicorn app.main:app --reload
 
-Env:   CAPTAIN_AMERICA_API_URL (default http://localhost:8000)
+Env:   CAPTAIN_DDOSKI_API_URL (default http://localhost:8000)
 """
 from __future__ import annotations
 
@@ -25,8 +25,7 @@ from pydantic import Field
 
 from app.core.observability import get_tracer, init_observability
 
-# AGENTSHIELD_* remains a migration fallback for existing local MCP configs.
-API_URL = os.environ.get("CAPTAIN_AMERICA_API_URL") or os.environ.get("AGENTSHIELD_API_URL", "http://localhost:8000")
+API_URL = os.environ.get("CAPTAIN_DDOSKI_API_URL", "http://localhost:8000")
 
 # This is a separate OS process from the FastAPI engine, so it needs its own
 # tracer-provider registration. With httpx auto-instrumented on both sides
@@ -36,25 +35,25 @@ API_URL = os.environ.get("CAPTAIN_AMERICA_API_URL") or os.environ.get("AGENTSHIE
 init_observability()
 
 logging.basicConfig(
-    level=os.environ.get("CAPTAIN_AMERICA_MCP_LOG_LEVEL") or os.environ.get("AGENTSHIELD_MCP_LOG_LEVEL", "INFO"),
+    level=os.environ.get("CAPTAIN_DDOSKI_MCP_LOG_LEVEL", "INFO"),
     stream=sys.stderr,
-    format="%(asctime)s %(levelname)s [captain_america.mcp] %(message)s",
+    format="%(asctime)s %(levelname)s [captain_ddoski.mcp] %(message)s",
 )
-logger = logging.getLogger("captain_america.mcp")
+logger = logging.getLogger("captain_ddoski.mcp")
 
-mcp = FastMCP("captain_america_mcp")
+mcp = FastMCP("captain_ddoski_mcp")
 
 
 @mcp.tool(
-    name="captain_america_demo_sources",
+    name="captain_ddoski_demo_sources",
     description=(
-        "Return deterministic finance source URLs for testing Captain America MCP calls. "
+        "Return deterministic finance source URLs for testing Captain Ddoski MCP calls. "
         "Use one trusted and one risky URL when you need a quick demo."
     ),
     annotations={"readOnlyHint": True, "idempotentHint": True, "openWorldHint": False},
 )
-async def captain_america_demo_sources() -> dict[str, Any]:
-    logger.info("tool=captain_america_demo_sources")
+async def captain_ddoski_demo_sources() -> dict[str, Any]:
+    logger.info("tool=captain_ddoski_demo_sources")
     return {
         "task": "Research low-risk retirement investments for a consumer-facing finance agent.",
         "trusted": "https://www.sec.gov/investor/pubs/assetallocation.htm",
@@ -63,7 +62,7 @@ async def captain_america_demo_sources() -> dict[str, Any]:
 
 
 @mcp.tool(
-    name="captain_america_score_source",
+    name="captain_ddoski_score_source",
     description=(
         "Validate the credibility of a FINANCE web source before trusting it. "
         "Returns a trust score (0-100), a USE/CAUTION/AVOID recommendation, risk "
@@ -73,22 +72,22 @@ async def captain_america_demo_sources() -> dict[str, Any]:
     ),
     annotations={"readOnlyHint": True, "idempotentHint": True, "openWorldHint": True},
 )
-async def captain_america_score_source(
+async def captain_ddoski_score_source(
     url: Annotated[str, Field(description="The finance web source URL to evaluate")],
     task: Annotated[str, Field(description="What you intend to do with this source")],
 ) -> dict:
-    logger.info("tool=captain_america_score_source url=%s task=%s", url, task)
+    logger.info("tool=captain_ddoski_score_source url=%s task=%s", url, task)
     tracer = get_tracer()
-    with tracer.start_as_current_span("captain_america_mcp.score_source") as span:
+    with tracer.start_as_current_span("captain_ddoski_mcp.score_source") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)
-        span.set_attribute("mcp.tool", "captain_america_score_source")
-        span.set_attribute("captain_america.url", url)
-        span.set_attribute("captain_america.task", task)
+        span.set_attribute("mcp.tool", "captain_ddoski_score_source")
+        span.set_attribute("captain_ddoski.url", url)
+        span.set_attribute("captain_ddoski.task", task)
         try:
             async with httpx.AsyncClient(timeout=60.0) as client:
                 resp = await client.post(
                     f"{API_URL}/api/score-source",
-                    headers={"X-Captain-America-Caller": "claude-mcp"},
+                    headers={"X-Captain-Ddoski-Caller": "claude-mcp"},
                     json={"url": url, "task": task},
                 )
                 resp.raise_for_status()
@@ -101,14 +100,14 @@ async def captain_america_score_source(
                     payload.get("recommendation"),
                     payload.get("risk_tags"),
                 )
-                span.set_attribute("captain_america.trust_score", payload.get("trust_score", -1))
-                span.set_attribute("captain_america.recommendation", payload.get("recommendation", ""))
+                span.set_attribute("captain_ddoski.trust_score", payload.get("trust_score", -1))
+                span.set_attribute("captain_ddoski.recommendation", payload.get("recommendation", ""))
                 return payload
         except httpx.ConnectError as exc:
             logger.exception("engine unreachable api_url=%s", API_URL)
             span.record_exception(exc)
             raise RuntimeError(
-                f"Captain America engine unreachable at {API_URL}. Start it with: "
+                f"Captain Ddoski engine unreachable at {API_URL}. Start it with: "
                 f"cd backend && uvicorn app.main:app --reload"
             ) from exc
         except httpx.HTTPStatusError as exc:
@@ -118,5 +117,5 @@ async def captain_america_score_source(
 
 
 if __name__ == "__main__":
-    logger.info("starting Captain America MCP server api_url=%s", API_URL)
+    logger.info("starting Captain Ddoski MCP server api_url=%s", API_URL)
     mcp.run()  # stdio transport

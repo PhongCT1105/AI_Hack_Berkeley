@@ -1,13 +1,13 @@
-# Captain America development plan
+# Captain Ddoski development plan
 
 This document is the source of truth for what is live, what is synthetic, and what must change
-before describing Captain America as a production source-verification product.
+before describing Captain Ddoski as a production source-verification product.
 
 ## Current state
 
 | Area | Status | What is real today | Constraint or placeholder |
 |---|---|---|---|
-| Brand and public interfaces | Active | Product name, API caller header, MCP server, tracing, and frontend use Captain America. | The legacy `X-AgentShield-Caller` header and `AGENTSHIELD_*` MCP variables remain only as migration fallbacks. |
+| Brand and public interfaces | Active | Product name, API caller header, MCP server, tracing, and frontend use Captain Ddoski. | The legacy `X-Captain Ddoski-Caller` header and `CAPTAIN_DDOSKI_*` MCP variables remain only as migration fallbacks. |
 | Direct source scoring | Active | `/api/score-source` collects a URL, extracts signals, ranks it, compresses evidence, and records history. | The fallback collector is less reliable than Firecrawl on JavaScript-heavy sites. |
 | Prompt-driven research | Active with Firecrawl | `/api/research` uses Firecrawl Search, scores each discovered source, and only synthesizes from `USE` sources. | Firecrawl configuration is mandatory. Per-source scoring failures are currently excluded from the result rather than itemized. |
 | Crawl endpoint | Active | `/api/crawl` turns supplied URLs into page, claim, and training-payload records. | It does not discover URLs and does not persist crawl jobs. |

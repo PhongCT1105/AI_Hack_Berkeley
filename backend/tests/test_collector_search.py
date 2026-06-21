@@ -21,7 +21,7 @@ class CollectorSearchTests(unittest.IsolatedAsyncioTestCase):
         collector._search_firecrawl = AsyncMock(side_effect=RuntimeError("provider unavailable"))
 
         with patch("app.services.collector.settings", SimpleNamespace(has_firecrawl=True)), self.assertLogs(
-            "captain_america.collector", level="ERROR"
+            "captain_ddoski.collector", level="ERROR"
         ):
             result = await collector.search("SEC filings", 10)
 

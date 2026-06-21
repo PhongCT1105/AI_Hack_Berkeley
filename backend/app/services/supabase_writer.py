@@ -17,7 +17,7 @@ from openinference.semconv.trace import OpenInferenceSpanKindValues, SpanAttribu
 from app.core.config import settings
 from app.core.observability import get_tracer
 
-logger = logging.getLogger("captain_america.supabase_writer")
+logger = logging.getLogger("captain_ddoski.supabase_writer")
 
 
 async def insert_task_row(row: dict) -> str | None:
@@ -26,7 +26,7 @@ async def insert_task_row(row: dict) -> str | None:
     effort, never raises, mirroring terac_client.push_pair's local-only
     fallback philosophy."""
     tracer = get_tracer()
-    with tracer.start_as_current_span("captain_america.supabase.insert_task") as span:
+    with tracer.start_as_current_span("captain_ddoski.supabase.insert_task") as span:
         span.set_attribute(SpanAttributes.OPENINFERENCE_SPAN_KIND, OpenInferenceSpanKindValues.TOOL.value)
         span.set_attribute("supabase.task_id", row.get("task_id", ""))
         span.set_attribute("supabase.configured", bool(settings.supabase_url and settings.supabase_key))
